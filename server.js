@@ -401,7 +401,7 @@ setInterval(() => {
     molds.forEach((mold) => {
       const { mold_id, moldNo, lifespan, maintainanceAlert, production_cnt } = mold;
 
-      //const mobileNo=['+919579029553','+919307595421'];
+      const mobileNo=['+919579029553'];
 
       // Check if mold is expired
 
