@@ -509,7 +509,7 @@
 
                 // Send data to the server
                 $.ajax({
-                    url: 'http://localhost:3000/api/submit-data', // Node.js route
+                    url: '/api/submit-data', // Node.js route
                     method: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(formData),
