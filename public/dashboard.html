@@ -907,6 +907,8 @@
                             notificationElement.classList.add('highlight-yellow'); // Add class for yellow styling
                         } else if (notification.notification_type === 'expiration_soon') {
                             notificationElement.classList.add('highlight-red'); // Add class for red styling
+                        } else if(notification.notification_type==='limitAlert'){
+                            notificationElement.classList.add('highlight-red');
                         }
 
                         // Get icon based on notification type
