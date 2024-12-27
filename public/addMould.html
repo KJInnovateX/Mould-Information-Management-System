@@ -1,0 +1,390 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mould Details Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Custom styles for the sidebar */
+        #sidebar {
+            width: 70px;
+            background-color: #fcfbfd;
+            color: rgb(74, 72, 72);
+            position: fixed;
+            top: 94px;
+            left: 10px;
+            height: 80%;
+            padding-top: 20px;
+            border-radius: 50%;
+            /* Half-circle shape */
+            transition: width 0.3s, border-radius 0.3s;
+            box-shadow: 5px 5px 20px rgba(0, 247, 255, 0.792);
+            overflow: hidden;
+            z-index: 1000;
+            justify-content: flex-start;
+            box-sizing: border-box;
+        }
+
+        #sidebar.expanded {
+            width: 250px;
+            border-radius: 15px;
+            /* Slightly curved for expansion */
+        }
+
+        #sidebar ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #sidebar ul li {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            text-align: center;
+            transition: background-color 0.3s, color 0.3s;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        #sidebar ul li a {
+            color: rgb(7, 7, 7);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            justify-content: center;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        #sidebar ul li a i {
+            font-size: 30px;
+            margin-left: 10px;
+            /* Increased size for better visibility */
+            margin-right: 10px;
+            /* Add space between icon and text */
+            color: rgb(74, 72, 72);
+        }
+
+        #sidebar.expanded ul li a i {
+            font-size: 32px;
+            /* Larger icon size when sidebar is expanded */
+        }
+
+        #sidebar ul li a span {
+            display: none;
+        }
+
+        #sidebar.expanded ul li a span {
+            display: inline;
+            margin-left: 10px;
+            font-size: 18px;
+            /* Adjust font size for text */
+        }
+
+        #sidebar ul li a:hover {
+            background-color: #a8cbe1;
+            color: rgb(0, 0, 0);
+            border-radius: 10px;
+        }
+
+
+
+        #sidebarToggle {
+            background: none;
+            border: none;
+            color: #00eeff;
+            font-size: 28px;
+            cursor: pointer;
+            position: absolute;
+            top: 100px;
+            left: 21px;
+        }
+
+        main {
+            margin-left: 90px;
+            transition: margin-left 0.6s;
+        }
+
+        #sidebar.expanded+main {
+            margin-left: 270px;
+        }
+
+        @media screen and (max-width: 768px) {
+            #sidebar {
+                width: 60px;
+            }
+
+            #sidebar.expanded {
+                width: 220px;
+            }
+
+            main {
+                margin-left: 60px;
+            }
+
+            #sidebar.expanded+main {
+                margin-left: 200px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            #sidebar {
+                width: 50px;
+            }
+
+            #sidebar.expanded {
+                width: 180px;
+            }
+
+            main {
+                margin-left: 50px;
+            }
+
+            #sidebar.expanded+main {
+                margin-left: 180px;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex">
+    <div id="backButton" class="fixed top-4 left-4 z-50">
+        <a href="javascript:history.back();" class="flex items-center p-2 rounded-full transition-all duration-300">
+            <img src="https://firebasestorage.googleapis.com/v0/b/tunnel-ac8de.appspot.com/o/icons%2Fundo.png?alt=media&token=64d78468-bdc2-4437-87ca-98b45b6e8e9d"
+                alt="Back Button"
+                class="w-12 h-12 rounded-full transition-all duration-300 hover:border-4 hover:border-black hover:shadow-lg" />
+        </a>
+    </div>
+
+
+
+    <aside id="sidebar">
+        <button id="sidebarToggle"><i class="fas fa-bars"></i></button>
+        <ul>
+            <li><a href="dashboard.html" class="sidebar-item"><i class="fas fa-tachometer-alt"></i><span>
+                        Dashboard</span></a></li>
+            <li><a href="viewMold.html" class="sidebar-item"><i class="fas fa-cogs"></i><span> Mould
+                        Management</span></a></li>
+            <li><a href="dataEntry.html" class="sidebar-item"><i class="fas fa-database"></i><span> Data
+                        Entry</span></a></li>
+            <li>
+                <a href="bulkDataEntry.html" class="sidebar-item">
+                    <i class="fas fa-upload"></i><span> Bulk Data Entry</span>
+                </a>
+            </li>
+
+        </ul>
+    </aside>
+    <div class="flex-1 flex flex-col">
+        <main class="p-8 transition-all duration-300">
+            <div class="max-w-4xl w-full bg-white p-8 rounded-lg shadow-lg mx-auto">
+                <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Mould Details Form</h1>
+                <form class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="mouldType" class="block text-gray-700 font-semibold mb-2">Mould Type</label>
+                        <input type="text" id="mouldType" name="mouldType"
+                            class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="mouldNo" class="block text-gray-700 font-semibold mb-2">Mould No.</label>
+                        <input type="text" id="mouldNo" name="moldNo"
+                            class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="date" class="block text-gray-700 font-semibold mb-2">Date</label>
+                        <input type="datetime-local" id="date" name="date" value="<?php echo date('Y-m-d\TH:i'); ?>"
+                            class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="lifespan" class="block text-gray-700 font-semibold mb-2">Max Production
+                            Count</label>
+                        <input type="number" id="lifespan" name="lifespan"
+                            class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="status" class="block text-gray-700 font-semibold mb-2">Status</label>
+                        <select id="status" name="status"
+                            class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                            <option value="Under Maintenance">Under Maintenance</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="maintainanceAlert" class="block text-gray-700 font-semibold mb-2">Maintenance Alert
+                            (Product count)</label>
+                        <input type="number" id="maintainanceAlert" name="maintainanceAlert"
+                            class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="mouldManufacturerName" class="block text-gray-700 font-semibold mb-2">Mould
+                            Manufacturer Name</label>
+                        <input type="text" id="mouldManufacturerName" name="mouldManufacturerName"
+                            class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="manufacturerContact" class="block text-gray-700 font-semibold mb-2">Manufacturer
+                            Contact</label>
+                        <input type="text" id="manufacturerContact" name="manufacturerContact"
+                            class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div class="col-span-1 md:col-span-2 flex flex-col items-center">
+                        <label for="mouldAddedBy" class="block text-gray-700 font-semibold mb-2">Mould Added By (Name of
+                            Operator)</label>
+                        <select id="mouldAddedBy" name="mouldAddedBy"
+                            class="w-full md:w-1/2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="operator1">Operator 1</option>
+                            <option value="operator2">Operator 2</option>
+                            <option value="operator3">Operator 3</option>
+                            <option value="operator4">Operator 4</option>
+                        </select>
+                    </div>
+                    <div class="col-span-1 md:col-span-2">
+                        <label for="remark" class="block text-gray-700 font-semibold mb-2">Remark</label>
+                        <textarea id="remark" name="remark" rows="4"
+                            class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+                    <div class="col-span-1 md:col-span-2">
+                        <button type="submit"
+                            class="w-full bg-blue-500 text-white p-3 rounded-lg font-semibold hover:bg-blue-600 transition duration-300">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for popup -->
+    <div id="popup-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div id="popup"
+            class="bg-white rounded-3xl w-96 h-80 p-8 text-center shadow-lg transform scale-75 opacity-0 transition-transform duration-500 ease-out">
+            <div id="popup-icon" class="text-green-600 text-6xl mb-4 animate-bounce">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2 id="popup-title" class="text-2xl font-bold text-gray-800 mb-2">Title</h2>
+            <p id="popup-message" class="text-lg text-gray-600 mb-6">Message</p>
+            <button
+                class="bg-blue-500 text-white px-5 py-2 rounded-full text-lg shadow hover:bg-blue-700 focus:outline-none transition-transform transform hover:scale-105 active:scale-95"
+                onclick="hidePopup()">Close</button>
+        </div>
+    </div>
+    <style>
+        /* Additional styles for the popup */
+        #popup-overlay {
+            backdrop-filter: blur(5px);
+        }
+
+        #popup {
+            animation: fadeIn 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+
+    <script>
+        document.getElementById('sidebarToggle').addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('expanded');
+            document.querySelector('main').classList.toggle('expanded');
+        });
+
+        // Handle Form Submission
+        const form = document.querySelector('form');
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            // Collect form data
+            const formData = {
+                mouldType: document.getElementById('mouldType').value,
+                mouldNo: document.getElementById('mouldNo').value,
+                date: document.getElementById('date').value,
+                lifespan: document.getElementById('lifespan').value,
+                status: document.getElementById('status').value,
+                maintainanceAlert: document.getElementById('maintainanceAlert').value,
+                mouldManufacturerName: document.getElementById('mouldManufacturerName').value,
+                manufacturerContact: document.getElementById('manufacturerContact').value,
+                mouldAddedBy: document.getElementById('mouldAddedBy').value,
+                remark: document.getElementById('remark').value,
+            };
+
+            // Simulate form submission and show success message in the popup
+            try {
+                const response = await fetch('http://localhost:3000/api/molds', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData),
+                });
+                console.log('Form Data:', formData);
+                if (response.ok) {
+                    showPopup('Mould Data added successfully!', 'You can now close this window.', 'success');
+                    document.getElementById("form").reset();
+                } else {
+                    const error = await response.json();
+                    showPopup('Error!', `Please recheck all field's once. ${error.error} `, 'info');
+                }
+            }
+            catch (error) {
+                console.log(error);
+
+                showPopup('Failed to add mould data!','Try again .','error');
+            }
+        });
+
+        function showPopup(title, message, type) {
+            const overlay = document.getElementById('popup-overlay');
+            const popup = document.getElementById('popup');
+            const icon = document.getElementById('popup-icon');
+
+            // Set title and message
+            document.getElementById('popup-title').textContent = title;
+            document.getElementById('popup-message').textContent = message;
+
+            // Adjust icon and styles based on type
+            if (type === 'success') {
+                icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                icon.className = 'text-green-600 text-6xl mb-4 animate-bounce';
+            } else if (type === 'error') {
+                icon.innerHTML = '<i class="fas fa-times-circle"></i>';
+                icon.className = 'text-red-600 text-6xl mb-4 animate-bounce';
+            } else if (type === 'info') {
+                icon.innerHTML = '<i class="fas fa-info-circle"></i>';
+                icon.className = 'text-blue-600 text-6xl mb-4 animate-bounce';
+            }
+
+            // Display the pop-up
+            overlay.classList.remove('hidden');
+            setTimeout(() => {
+                popup.classList.remove('scale-75', 'opacity-0');
+            }, 10);
+        }
+
+        function hidePopup() {
+            const overlay = document.getElementById('popup-overlay');
+            const popup = document.getElementById('popup');
+
+            popup.classList.add('scale-75', 'opacity-0');
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+            }, 300);
+        }
+
+    </script>
+</body>
+
+</html>

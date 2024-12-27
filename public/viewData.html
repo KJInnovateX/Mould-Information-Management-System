@@ -1,0 +1,418 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mold Details Table</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        #h1_Id {
+            margin-top: 25px;
+            align-content: center;
+        }
+
+        /* Custom styles for the sidebar */
+        #sidebar {
+            width: 70px;
+            background-color: #fcfbfd;
+            color: rgb(74, 72, 72);
+            position: fixed;
+            top: 94px;
+            left: 10px;
+            height: 80%;
+            padding-top: 20px;
+            border-radius: 50%;
+            /* Half-circle shape */
+            transition: width 0.3s, border-radius 0.3s;
+            box-shadow: 5px 5px 20px rgba(0, 247, 255, 0.792);
+            overflow: hidden;
+            z-index: 1000;
+            justify-content: flex-start;
+            box-sizing: border-box;
+        }
+
+        #sidebar.expanded {
+            width: 250px;
+            border-radius: 15px;
+            /* Slightly curved for expansion */
+        }
+
+        #sidebar ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #sidebar ul li {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            text-align: center;
+            transition: background-color 0.3s, color 0.3s;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        #sidebar ul li a {
+            color: rgb(7, 7, 7);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            justify-content: center;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        #sidebar ul li a i {
+            font-size: 30px;
+            margin-left: 10px;
+            /* Increased size for better visibility */
+            margin-right: 10px;
+            /* Add space between icon and text */
+            color: rgb(74, 72, 72);
+        }
+
+        #sidebar.expanded ul li a i {
+            font-size: 32px;
+            /* Larger icon size when sidebar is expanded */
+        }
+
+        #sidebar ul li a span {
+            display: none;
+        }
+
+        #sidebar.expanded ul li a span {
+            display: inline;
+            margin-left: 10px;
+            font-size: 18px;
+            /* Adjust font size for text */
+        }
+
+        #sidebar ul li a:hover {
+            background-color: #a8cbe1;
+            color: rgb(0, 0, 0);
+            border-radius: 10px;
+        }
+
+
+
+        #sidebarToggle {
+            background: none;
+            border: none;
+            color: #00eeff;
+            font-size: 28px;
+            cursor: pointer;
+            position: absolute;
+            top: 100px;
+            left: 21px;
+        }
+
+        main {
+            margin-left: 90px;
+            transition: margin-left 0.6s;
+        }
+
+        #sidebar.expanded+main {
+            margin-left: 270px;
+        }
+
+        @media screen and (max-width: 768px) {
+            #sidebar {
+                width: 60px;
+            }
+
+            #sidebar.expanded {
+                width: 220px;
+            }
+
+            main {
+                margin-left: 60px;
+            }
+
+            #sidebar.expanded+main {
+                margin-left: 200px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            #sidebar {
+                width: 50px;
+            }
+
+            #sidebar.expanded {
+                width: 180px;
+            }
+
+            main {
+                margin-left: 50px;
+            }
+
+            #sidebar.expanded+main {
+                margin-left: 180px;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex">
+    <div id="backButton" class="fixed top-4 left-4 z-50">
+        <a href="javascript:history.back();" class="flex items-center p-2 rounded-full transition-all duration-300">
+            <img src="https://firebasestorage.googleapis.com/v0/b/tunnel-ac8de.appspot.com/o/icons%2Fundo.png?alt=media&token=64d78468-bdc2-4437-87ca-98b45b6e8e9d"
+                alt="Back Button"
+                class="w-12 h-12 rounded-full transition-all duration-300 hover:border-4 hover:border-black hover:shadow-lg" />
+        </a>
+    </div>
+    <aside id="sidebar">
+        <button id="sidebarToggle"><i class="fas fa-bars"></i></button>
+        <ul>
+            <li><a href="dashboard.html" class="sidebar-item"><i class="fas fa-tachometer-alt"></i><span>
+                        Dashboard</span></a></li>
+            <li><a href="viewMold.html" class="sidebar-item"><i class="fas fa-cogs"></i><span> Mold
+                        Management</span></a></li>
+            <li><a href="dataEntry.html" class="sidebar-item"><i class="fas fa-database"></i><span> Data
+                        Entry</span></a></li>
+            <li>
+                <a href="bulkDataEntry.html" class="sidebar-item">
+                    <i class="fas fa-upload"></i><span> Bulk Data Entry</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+    <div class="absolute top-4 right-9 flex items-center">
+        <button id="exportToExcel" class="bg-green-500 text-white px-4 py-2 rounded-md shadow-md">
+            Export to Excel
+        </button>
+    </div>
+
+
+
+    <div class="flex-1 flex flex-col items-center p-4">
+        <main class="w-full max-w-[1300px] transition-all duration-300">
+            <!-- Card container -->
+
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+
+                <!-- Card header -->
+                <div class="bg-gray-100 px-6 py-4 border-b flex items-center justify-center">
+                    <h1 id="h1_Id" class="text-2xl md:text-3xl font-bold text-gray-800">Mould Analysis</h1>
+                </div>
+
+
+                <!-- Card body -->
+                <div class="p-6">
+                    <div class="max-h-[500px] overflow-y-auto border border-gray-300 rounded-lg">
+                        <table class="min-w-full bg-white text-center border-collapse">
+                            <thead class="bg-gray-200 sticky top-0 z-10">
+                                <tr class="min-w-full bg-gray-200 text-gray-700">
+                                    <th class="py-2 md:py-3 px-2 md:px-4 border-b">Mould Type</th>
+                                    <th class="py-2 md:py-3 px-2 md:px-4 border-b">Mould Number</th>
+                                    <th class="py-2 md:py-3 px-2 md:px-4 border-b">Date and Time</th>
+                                    <th class="py-2 md:py-3 px-2 md:px-4 border-b">Breakdown Occur</th>
+                                    <th class="py-2 md:py-3 px-2 md:px-4 border-b">Before Breakdown Production</th>
+                                    <th class="py-2 md:py-3 px-2 md:px-4 border-b">Problem Resolved</th>
+                                    <th class="py-2 md:py-3 px-2 md:px-4 border-b">Cost Needed</th>
+                                    <th class="py-2 md:py-3 px-2 md:px-4 border-b">Cost</th>
+                                    <th class="py-2 md:py-3 px-2 md:px-4 border-b">After Breakdown Production</th>
+                                    <th class="py-2 md:py-3 px-2 md:px-4 border-b">Remark</th>
+                                    <th class="py-2 md:py-3 px-2 md:px-4 border-b">Operator Name</th>
+                                    <th class="py-2 md:py-3 px-2 md:px-4 border-b">Operator ID</th>
+                                    <th class="py-2 md:py-3 px-2 md:px-4 border-b">Total Production Count</th>
+                                    <th class="py-2 md:py-3 px-2 md:px-4 border-b">Remark (No Breakdown)</th>
+                                    <th class="py-2 md:py-3 px-2 md:px-4 border-b">Operator Name (No Breakdown)</th>
+                                    <th class="py-2 md:py-3 px-2 md:px-4 border-b">Operator ID (No Breakdown)</th>
+                                    <th class="py-2 md:py-3 px-2 md:px-4 border-b">Update Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="moldDataBody" class="overflow-y-auto min-w-full min-h-full">
+                                <!-- Data will be injected here dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    
+    <div id="popup-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div id="popup"
+            class="bg-white rounded-3xl w-96 h-80 p-8 text-center shadow-lg transform scale-75 opacity-0 transition-transform duration-500 ease-out">
+            <div id="popup-icon" class="text-green-600 text-6xl mb-4 animate-bounce">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2 id="popup-title" class="text-2xl font-bold text-gray-800 mb-2">Title</h2>
+            <p id="popup-message" class="text-lg text-gray-600 mb-6">Message</p>
+            <button
+                class="bg-blue-500 text-white px-5 py-2 rounded-full text-lg shadow hover:bg-blue-700 focus:outline-none transition-transform transform hover:scale-105 active:scale-95"
+                onclick="hidePopup()">Close</button>
+        </div>
+    </div>
+    <style>
+        /* Additional styles for the popup */
+        #popup-overlay {
+            backdrop-filter: blur(5px);
+        }
+
+        #popup {
+            animation: fadeIn 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+
+    <script>
+
+        // export to excel 
+        document.getElementById('exportToExcel').addEventListener('click', function () {
+            const moldNo = getQueryParam('moldNo');
+            const table = document.querySelector('table');
+            const wb = XLSX.utils.table_to_book(table, { sheet: "Mold Data" });
+            XLSX.writeFile(wb, `Mold_Data_moldId:${moldNo}.xlsx`);
+        });
+
+
+        // Function to fetch data and populate the table
+        async function fetchAndPopulateMoldData(moldNo) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/getDateEntry/${moldNo}`); // Fetch data from the API
+                if (response.ok) {
+                    const data = await response.json(); // Parse the JSON response
+                    const tbody = document.getElementById('moldDataBody');
+                    tbody.innerHTML = ''; // Clear existing rows
+
+                    // Loop through the fetched data and create rows
+                    data.forEach((item) => {
+                        const row = document.createElement('tr');
+                        row.className = 'bg-white text-gray-700 hover:bg-gray-100';
+                        const date = new Date(item.date_time);
+
+                        // Extract components
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+                        const year = date.getFullYear();
+                        const hours = String(date.getHours()).padStart(2, '0');
+                        const minutes = String(date.getMinutes()).padStart(2, '0');
+
+                        // Format the result
+                        const date_time = `${day}/${month}/${year}, ${hours}:${minutes}`;
+                        // Insert table cells
+                        row.innerHTML = `
+                            
+                            <td class="py-2 px-4 border">${item.mold_type || '-'}</td>
+                            <td class="py-2 px-4 border">${item.mold_number || '-'}</td>
+                            <td class="py-2 px-4 border">${date_time || '-'}</td>
+                            <td class="py-2 px-4 border">${(item.breakdown_occur || '-').toUpperCase()}</td>
+                            <td class="py-2 px-4 border">${item.before_breakdown_production || 'NILL'}</td>
+                            <td class="py-2 px-4 border">${(item.problem_resolved || '-').toUpperCase()}</td>
+                            <td class="py-2 px-4 border">${(item.cost_needed || '-').toUpperCase()}</td>
+                            <td class="py-2 px-4 border">${item.cost || 'NILL'}</td>
+                            <td class="py-2 px-4 border">${item.after_breakdown_production || 'NILL'}</td>
+                            <td class="py-2 px-4 border">${item.remark || '-'}</td>
+                            <td class="py-2 px-4 border">${item.operator_name || '-'}</td>
+                            <td class="py-2 px-4 border">${item.operator_id || '-'}</td>
+                            <td class="py-2 px-4 border">${item.production_cnt || '-'}</td>
+                            <td class="py-2 px-4 border">${item.remark_no_breakdown || '-'}</td>
+                            <td class="py-2 px-4 border">${item.operator_name_no_breakdown || '-'}</td>
+                            <td class="py-2 px-4 border">${item.operator_id_no_breakdown || '-'}</td>
+                            <td class="py-2 md:py-3 px-2 md:px-4 border-b">
+                            <button id="${item.moldNo}" class="bg-blue-500 text-white px-2 md:px-4 py-1 md:py-2 rounded" onclick="">Update</button>
+                            </td>
+                            
+                        `;
+                        tbody.appendChild(row); // Append the row to the tbody
+                    });
+                } else {
+                    showPopup('Failed to Load Data!','No data found or an error occurred','error');
+                    
+                }
+            } catch (error) {
+                console.error('Error fetching mold data:', error);
+                showPopup('Error fetching data','Try again...','error');
+                
+            }
+        }
+
+        // Example call: Replace '12345' with the actual moldNo from a search input
+        // Utility function to get a query parameter by name
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // Fetch and populate mold data on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const moldNo = getQueryParam('moldNo'); // Get 'moldNo' parameter from URL
+            if (moldNo) {
+                fetchAndPopulateMoldData(moldNo); // Fetch data if 'moldNo' exists
+            } else {
+                console.warn("No 'moldNo' query parameter found in URL");
+            }
+        });
+
+        function showPopup(title, message, type) {
+            const overlay = document.getElementById('popup-overlay');
+            const popup = document.getElementById('popup');
+            const icon = document.getElementById('popup-icon');
+
+            // Set title and message
+            document.getElementById('popup-title').textContent = title;
+            document.getElementById('popup-message').textContent = message;
+
+            // Adjust icon and styles based on type
+            if (type === 'success') {
+                icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                icon.className = 'text-green-600 text-6xl mb-4 animate-bounce';
+            } else if (type === 'error') {
+                icon.innerHTML = '<i class="fas fa-times-circle"></i>';
+                icon.className = 'text-red-600 text-6xl mb-4 animate-bounce';
+            } else if (type === 'info') {
+                icon.innerHTML = '<i class="fas fa-info-circle"></i>';
+                icon.className = 'text-blue-600 text-6xl mb-4 animate-bounce';
+            }
+
+            // Display the pop-up
+            overlay.classList.remove('hidden');
+            setTimeout(() => {
+                popup.classList.remove('scale-75', 'opacity-0');
+            }, 10);
+        }
+
+        function hidePopup() {
+            const overlay = document.getElementById('popup-overlay');
+            const popup = document.getElementById('popup');
+
+            popup.classList.add('scale-75', 'opacity-0');
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+            }, 300);
+        }
+
+
+        document.getElementById('sidebarToggle').addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('expanded');
+            document.querySelector('main').classList.toggle('expanded');
+        });
+
+    </script>
+
+
+</body>
+
+</html>

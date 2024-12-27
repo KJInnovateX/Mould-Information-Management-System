@@ -1,0 +1,1001 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .cname {
+            font-family: 'Trebuchet MS', sans-serif;
+            color: #ffffff;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+            /* Strong shadow for depth */
+            letter-spacing: 2px;
+            font-size: 2em;
+            /* Slightly larger font for emphasis */
+            background: linear-gradient(45deg, #ff4500, #0080ff);
+            /* Vibrant orange and blue gradient */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+
+            font-weight: bolder;
+            /* Maximum boldness */
+        }
+
+        a {
+            text-decoration: none;
+            font-family: 'Arial', sans-serif;
+            color: #4a4a4a;
+            /* Gray color */
+            font-size: 1.2em;
+            transition: color 0.3s, transform 0.3s;
+        }
+
+        a:hover {
+            color: #007bff;
+            /* Blue color */
+            transform: scale(1.1);
+            /* Slight zoom effect */
+        }
+
+        a:active {
+            color: #0056b3;
+            /* Darker blue for active state */
+        }
+
+        .logo-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-link img {
+            width: 45px;
+            height: 40px;
+            border-radius: 50%;
+            /* Circular logo */
+            transition: transform 0.5s;
+        }
+
+        .logo-link img:hover {
+            transform: rotate(360deg);
+            /* Rotate on hover */
+        }
+
+        /* Custom styles for the sidebar */
+        #sidebar {
+            width: 70px;
+            background-color: #fcfbfd;
+            color: rgb(74, 72, 72);
+            position: fixed;
+            top: 94px;
+            left: 10px;
+            height: 80%;
+            padding-top: 20px;
+            border-radius: 50%;
+            /* Half-circle shape */
+            transition: width 0.3s, border-radius 0.3s;
+            box-shadow: 5px 5px 20px rgba(0, 247, 255, 0.792);
+            overflow: hidden;
+            z-index: 1000;
+            justify-content: flex-start;
+            box-sizing: border-box;
+        }
+
+        #sidebar.expanded {
+            width: 250px;
+            border-radius: 15px;
+            /* Slightly curved for expansion */
+        }
+
+        #sidebar ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #sidebar ul li {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            text-align: center;
+            transition: background-color 0.3s, color 0.3s;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        #sidebar ul li a {
+            color: rgb(7, 7, 7);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            justify-content: center;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        #sidebar ul li a i {
+            font-size: 30px;
+            margin-left: 10px;
+            /* Increased size for better visibility */
+            margin-right: 10px;
+            /* Add space between icon and text */
+            color: rgb(74, 72, 72);
+        }
+
+        #sidebar.expanded ul li a i {
+            font-size: 32px;
+            /* Larger icon size when sidebar is expanded */
+        }
+
+        #sidebar ul li a span {
+            display: none;
+        }
+
+        #sidebar.expanded ul li a span {
+            display: inline;
+            margin-left: 10px;
+            font-size: 18px;
+            /* Adjust font size for text */
+        }
+
+        #sidebar ul li a:hover {
+            background-color: #a8cbe1;
+            color: rgb(0, 0, 0);
+            border-radius: 10px;
+        }
+
+
+
+        #sidebarToggle {
+            background: none;
+            border: none;
+            color: #00eeff;
+            font-size: 28px;
+            cursor: pointer;
+            position: absolute;
+            top: 100px;
+            left: 21px;
+        }
+
+        main {
+            margin-left: 90px;
+            transition: margin-left 0.6s;
+        }
+
+        #sidebar.expanded+main {
+            margin-left: 270px;
+        }
+
+        @media screen and (max-width: 768px) {
+            #sidebar {
+                width: 60px;
+            }
+
+            #sidebar.expanded {
+                width: 220px;
+            }
+
+            main {
+                margin-left: 60px;
+            }
+
+            #sidebar.expanded+main {
+                margin-left: 200px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            #sidebar {
+                width: 50px;
+            }
+
+            #sidebar.expanded {
+                width: 180px;
+            }
+
+            main {
+                margin-left: 50px;
+            }
+
+            #sidebar.expanded+main {
+                margin-left: 180px;
+            }
+        }
+
+        /* Existing styles */
+        .notification {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .notification:hover {
+            background-color: #e0f7fa;
+            transform: scale(1.02);
+        }
+
+        .notification-icon {
+            margin-right: 10px;
+            color: #4a90e2;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-time {
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        /* Blinking effect for specific types */
+        .highlight-yellow {
+            animation: blink-yellow 1s infinite alternate;
+        }
+
+        .highlight-red {
+            animation: blink-red 1s infinite alternate;
+        }
+
+        /* Keyframes for blinking effects */
+        @keyframes blink-yellow {
+            0% {
+                background: linear-gradient(40deg, #ff3838, #ffe033);
+            }
+
+            100% {
+                background: linear-gradient(45deg, #f9f9f9, #f4f4f4);
+            }
+
+            /* Slightly darker yellow */
+        }
+
+        @keyframes blink-red {
+            0% {
+                background: linear-gradient(40deg, #ffe033, #ff3838);
+            }
+
+            100% {
+                background: linear-gradient(45deg, #f9f9f9, #f4f4f4);
+            }
+
+            /* Slightly darker red */
+        }
+
+        .blinking {
+            animation: blink-animation 1s steps(5, start) infinite;
+        }
+
+        @keyframes blink-animation {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .chart-container {
+            background-color: #f9f9f9;
+            /* Light background for the chart area */
+            border-radius: 10px;
+            /* Rounded corners */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            /* Subtle shadow */
+            padding: 20px;
+            /* Padding around the chart */
+        }
+
+
+        .modal {
+            display: none;
+            position: fixed;
+
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex">
+    <aside id="sidebar">
+        <button id="sidebarToggle"><i class="fas fa-bars"></i></button>
+        <ul>
+            <li>
+                <a href="dashboard.html" class="sidebar-item">
+                    <i class="fas fa-tachometer-alt"></i><span> Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="viewMold.html" class="sidebar-item">
+                    <i class="fas fa-cogs"></i><span> Mould Management</span>
+                </a>
+            </li>
+            <li>
+                <a href="dataEntry.html" class="sidebar-item">
+                    <i class="fas fa-database"></i><span> Data Entry</span>
+                </a>
+            </li>
+            <li>
+                <a href="bulkDataEntry.html" class="sidebar-item">
+                    <i class="fas fa-upload"></i><span> Bulk Data Entry</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <div class="flex-1 flex flex-col">
+        <header class="flex items-center justify-between p-4 bg-white shadow-md fixed w-full z-10">
+            <nav class="flex items-center space-x-4">
+                <a href="dashboard.html" class="logo-link">
+                    <img src="https://firebasestorage.googleapis.com/v0/b/tunnel-ac8de.appspot.com/o/icons%2FWhatsApp%20Image%202024-12-22%20at%2012.09.39_51027079%20(1).jpg?alt=media&token=6354ff03-99c8-493d-9a29-f20ea5fc8432"
+                        alt="Logo">
+                </a>
+                <h1 class="cname"><b> MASK POLYMERS Pvt. Ltd. </b> </h1>
+            </nav>
+            <div class="flex items-center ml-auto space-x-4"> <!-- Space between items horizontally -->
+                <div class="relative">
+                    <button id="search-toggle" class="text-gray-500">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <!-- Remove the hidden class to keep the search bar always expanded -->
+                    <input id="search-bar" class="search-bar bg-gray-200 rounded px-2 py-1 search-bar-expanded"
+                        type="text" placeholder="Enter Mould Number" />
+                </div>
+
+                <div>
+                    <button
+                        class="text-gray-700 hover:text-blue-500 bg-gray-100 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg px-4 py-2 shadow-md transition duration-200 ease-in-out"
+                        id="alertManagement" aria-label="Alert Management">
+                        <i class="fas fa-bell mr-2"></i>Set Alert
+                    </button>
+                </div>
+
+                <div>
+                    <button onclick="window.location.href='addMould.html';"
+                        class="text-gray-700 hover:text-blue-500 bg-gray-100 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg px-4 py-2 shadow-md transition duration-200 ease-in-out flex items-center"
+                        aria-label="Add Mold">
+                        <i class="fas fa-plus-circle mr-2"></i>Add Mould
+                    </button>
+                </div>
+
+                <div class="relative">
+                    <img alt="User Avatar" class="rounded-full cursor-pointer" height="40"
+                        src="https://firebasestorage.googleapis.com/v0/b/tunnel-ac8de.appspot.com/o/icons%2Fprofile_user.jpg?alt=media&token=259b8271-6dca-4ae1-bf8a-747109187050"
+                        width="40" id="user-avatar" onclick="toggleProfileCard()" />
+                </div>
+            </div>
+
+            <div id="profileCard"
+                class="hidden bg-white shadow-lg rounded-lg w-90 absolute top-16 right-4 animate-fadeIn">
+                <div
+                    class="bg-gradient-to-r from-blue-500 to-teal-400 p-4 flex justify-between text-lg text-white rounded-t-lg">
+                    <h2 class=" text-xl font-bold">Profile</h2>
+                    <i class="fas fa-times cursor-pointer" onclick="toggleProfileCard()"></i>
+                </div>
+                <div class="p-4 text-gray-800 text-lg" id="userDetails">
+                    <!-- Dynamic user details will be populated here -->
+                </div>
+                <div class="p-4 bg-gray-100 flex justify-between">
+                    <button
+                        class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition">Settings</button>
+                    <button class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition"
+                        onclick="logout()">Logout</button>
+                </div>
+            </div>
+
+        </header>
+        <main class="p-4 md:p-8 transition-all duration-300 mt-16">
+            <div
+                class="max-w-full md:max-w-7xl w-full bg-white p-4 md:p-8 rounded-lg shadow-lg mx-auto overflow-x-auto">
+                <h1 class="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-4 md:mb-6">Dashboard</h1>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                    <!-- Card 1 -->
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <div class="flex items-center">
+                            <div class="bg-blue-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-cube text-blue-500"></i>
+                            </div>
+                            <div>
+                                <p class="text-gray-700 text-xl font-semibold">Total Mould's</p>
+                                <p id="totalMoldsCard" class="text-gray-500 text-lg">Loading...</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card 3 -->
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <div class="flex items-center">
+                            <div class="bg-yellow-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-cogs text-yellow-500"></i>
+                            </div>
+                            <div>
+                                <p class="text-gray-700 text-xl font-semibold">Active Mould's</p>
+                                <p id="activeMoldsCard" class="text-gray-500 text-lg">Loading...</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card 2 -->
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <div class="flex items-center">
+                            <div class="bg-green-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-industry text-green-500"></i>
+                            </div>
+                            <div>
+                                <p class="text-gray-700 text-xl font-semibold">Today's Production</p>
+                                <p id="dailyProductionCard" class="text-gray-500 text-lg">Loading...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <!-- Weekly Production Trends -->
+                    <div class="bg-white p-6 rounded-lg shadow-lg mb-4">
+                        <h2 class="text-gray-700 text-xl font-semibold mb-4">Weekly Production Trends</h2>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-full">
+                                <canvas id="weeklyProductionTrends" class="w-full rounded-lg" height="450"
+                                    width="700"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Notifications -->
+
+                    <div class="bg-white p-6 rounded-lg shadow-lg mb-4">
+                        <h2 class="text-gray-700 text-xl font-semibold mb-4">Notifications</h2>
+                        <div id="notifications" class="space-y-4 overflow-y-auto max-h-96">
+                            <!-- Notifications will be dynamically loaded here -->
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for Alert Management -->
+    <div id="alertModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="text-xl font-semibold mb-4">Set Alert</h2>
+            <form id="alertForm">
+                <div class="mb-4">
+                    <label for="moldNumber" class="block text-gray-700">Mould Number</label>
+                    <input type="text" id="moldNumber" class="w-full px-3 py-2 border rounded-lg"
+                        placeholder="Enter Mold Number" required>
+                </div>
+                <div class="mb-4">
+                    <label for="productionLimit" class="block text-gray-700">Production Limit</label>
+                    <input type="number" id="productionLimit" class="w-full px-3 py-2 border rounded-lg"
+                        placeholder="Enter Production Limit" required>
+                </div>
+                <div class="mb-4">
+                    <label for="email" class="block text-gray-700">Email</label>
+                    <input type="email" id="email" class="w-full px-3 py-2 border rounded-lg" placeholder="Enter Email" required>
+                </div>
+                <div class="mb-4">
+                    <label for="mobileNo" class="block text-gray-700">Mobile Number</label>
+                    <input type="tel" id="mobileNo" class="w-full px-3 py-2 border rounded-lg"
+                        placeholder="Enter Mobile Number e.g +919579029553" required>
+                </div>
+                <button type="submit" class="w-full bg-blue-500 text-white px-3 py-2 rounded-lg">Set Alert</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for popup -->
+    <div id="popup-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div id="popup"
+            class="bg-white rounded-3xl w-96 h-80 p-8 text-center shadow-lg transform scale-75 opacity-0 transition-transform duration-500 ease-out">
+            <div id="popup-icon" class="text-green-600 text-6xl mb-4 animate-bounce">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2 id="popup-title" class="text-2xl font-bold text-gray-800 mb-2">Title</h2>
+            <p id="popup-message" class="text-lg text-gray-600 mb-6">Message</p>
+            <button
+                class="bg-blue-500 text-white px-5 py-2 rounded-full text-lg shadow hover:bg-blue-700 focus:outline-none transition-transform transform hover:scale-105 active:scale-95"
+                onclick="hidePopup()">Close</button>
+        </div>
+    </div>
+    <style>
+        /* Additional styles for the popup */
+        #popup-overlay {
+            backdrop-filter: blur(5px);
+        }
+
+        #popup {
+            animation: fadeIn 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Retrieve companyId from localStorage
+            const companyId = localStorage.getItem('companyId');
+
+            if (!companyId) {
+                showPopup('Please log in first', 'Redirecting to the login page....', 'info');
+                setInterval(() => {
+                    window.location.href = "index.html"; // Replace with the desired URL
+                }, 5000);
+                return;
+            }
+
+            // Fetch user details from the server
+            const response = await fetch(`http://localhost:3000/user/${companyId}`, { method: 'GET' });
+            const result = await response.json();
+
+            if (response.ok) {
+                const userData = result;
+                document.getElementById('userDetails').innerHTML = `
+                <p><strong>Name:</strong> ${userData.name}</p>
+                <p><strong>Mobile Number:</strong> ${userData.mobile}</p>
+                <p><strong>Company ID:</strong> ${userData.company_id}</p>
+                <p><strong>Email:</strong> ${userData.email}</p>
+            `;
+            } else {
+                showPopup('User Not Found!',result.message,'error');
+            }
+        });
+
+        function toggleProfileCard() {
+            const profileCard = document.getElementById('profileCard');
+            profileCard.classList.toggle('hidden');
+        }
+
+        function logout() {
+            // Clear localStorage and redirect to login page
+            localStorage.removeItem('companyId');
+            showPopup('Logout Successful!', 'You can leave the website', 'success');
+                setInterval(() => {
+                    window.location.href = "index.html"; // Replace with the desired URL
+                }, 5000);
+                return;
+        }
+
+        function load_data() {
+            fetch('http://localhost:3000/api/dashboard-data')
+                .then(response => response.json())
+                .then(data => {
+                    const dailyProduction = data.dailyProduction;
+                    if (dailyProduction == null) {
+                        dailyProduction = 0;
+                    }
+                    // Dynamically update card content
+                    document.getElementById('totalMoldsCard').innerText = data.totalMolds;
+                    document.getElementById('dailyProductionCard').innerText = `${dailyProduction} Units`;
+                    document.getElementById('activeMoldsCard').innerText = data.activeMolds;
+
+                })
+                .catch(error => console.error('Error fetching dashboard data:', error));
+        }
+
+        // Call load_data when the window is loaded
+
+
+        document.getElementById('sidebarToggle').addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('expanded');
+            document.querySelector('main').classList.toggle('expanded');
+        });
+
+        function toggleProfileCard() {
+            const profileCard = document.getElementById("profileCard");
+            profileCard.classList.toggle("hidden");
+        }
+
+        document.getElementById('search-toggle').addEventListener('click', function () {
+            searchMould();
+        });
+
+        document.getElementById('search-bar').addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') { // Check if the "Enter" key was pressed
+                searchMould();
+            }
+        });
+
+        function searchMould() {
+            const searchBar = document.getElementById('search-bar');
+            const mouldId = searchBar.value.trim(); // Get the input value and trim whitespace
+            searchBar.value = '';
+            if (mouldId) {
+                // Redirect to the report page with the mould ID as a query parameter
+                window.location.href = `/report.html?mouldNo=${mouldId}`;
+            } else {
+                showPopup('Search Failed!','Please enter a valid Mould Number.','error');
+            }
+        }
+
+        document.getElementById('alertManagement').addEventListener('click', function () {
+            document.getElementById('alertModal').style.display = 'flex';
+        });
+
+        document.querySelector('.close').addEventListener('click', function () {
+            document.getElementById('alertModal').style.display = 'none';
+        });
+
+        window.onclick = function (event) {
+            if (event.target == document.getElementById('alertModal')) {
+                document.getElementById('alertModal').style.display = 'none';
+            }
+        };
+
+        // Chart.js configuration for Weekly Production Trends
+        // Fetch data from the backend API
+        function load_weekly_data() {
+            // Fetch data from the backend API
+            fetch('http://localhost:3000/api/weekly-production')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Map the data to extract day names and production units
+                    const labels = data.map(entry => {
+                        const date = new Date(entry.productionDate); // Convert to Date object
+                        return date.toLocaleDateString('en-US', { weekday: 'long' }); // Get day name
+                    });
+                    const productionData = data.map(entry => entry.productionUnits); // Extract production units
+
+                    // Find the maximum production value and its index
+                    const maxProduction = Math.max(...productionData);
+                    const maxIndex = productionData.indexOf(maxProduction);
+
+                    // Define dynamic point colors, highlighting the max production point
+                    const pointColors = productionData.map((value, index) =>
+                        index === maxIndex ? 'rgba(255, 99, 132, 1)' : 'rgba(54, 162, 235, 1)'
+                    );
+
+                    // Create the chart dynamically with the fetched data
+                    const ctx1 = document.getElementById('weeklyProductionTrends').getContext('2d');
+                    new Chart(ctx1, {
+                        type: 'line',
+                        data: {
+                            labels: labels, // Use day names
+                            datasets: [{
+                                label: 'Production Units',
+                                data: productionData, // Use dynamic production data
+                                backgroundColor: 'rgba(54, 162, 235, 0.2)', // Light blue fill
+                                borderColor: 'rgba(54, 162, 235, 1)', // Blue border
+                                borderWidth: 3,
+                                pointBackgroundColor: pointColors, // Dynamic point colors
+                                pointBorderColor: '#fff',
+                                pointHoverBackgroundColor: '#fff',
+                                pointHoverBorderColor: pointColors,
+                                pointRadius: 6, // Larger points
+                                pointHoverRadius: 8, // Larger hover points
+                                fill: true,
+                                tension: 0.4,
+                                cubicInterpolationMode: 'monotone'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: {
+                                    title: {
+                                        display: true,
+                                        text: 'Days', // Title for the x-axis
+                                        color: 'rgba(54, 162, 235, 1)',
+                                        font: {
+                                            size: 14
+                                        }
+                                    },
+                                    grid: {
+                                        color: 'rgba(0, 0, 0, 0.1)', // Light grid lines
+                                    }
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Units', // Title for the y-axis
+                                        color: 'rgba(54, 162, 235, 1)',
+                                        font: {
+                                            size: 14
+                                        }
+                                    },
+                                    grid: {
+                                        color: 'rgba(0, 0, 0, 0.1)', // Light grid lines
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    labels: {
+                                        color: 'rgba(54, 162, 235, 1)'
+                                    }
+                                },
+                                tooltip: {
+                                    backgroundColor: 'rgba(255, 255, 255, 0.9)', // White background for tooltips
+                                    titleColor: 'rgba(54, 162, 235, 1)',
+                                    bodyColor: 'rgba(0, 0, 0, 0.8)',
+                                    borderColor: 'rgba(54, 162, 235, 1)',
+                                    borderWidth: 1,
+                                    callbacks: {
+                                        afterBody: (tooltipItems) => {
+                                            // Highlight if the item is the maximum
+                                            const index = tooltipItems[0].dataIndex;
+                                            if (index === maxIndex) {
+                                                return `Highest Production Day!`;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } // Closing the options object
+                    });
+
+                    // Add blinking effect for the highest production point
+                    const highestPoint = ctx1.canvas.getElementsByTagName('circle')[maxIndex];
+                    if (highestPoint) {
+                        highestPoint.classList.add('blinking');
+                    }
+                })
+                .catch(error => console.error('Error fetching weekly production data:', error));
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const alertModal = document.getElementById('alertModal');
+            const alertForm = document.getElementById('alertForm');
+            const closeModal = document.querySelector('.close');
+
+            // Open modal (add event to your trigger button)
+            const openModal = () => {
+                alertModal.style.display = 'block';
+            };
+
+            // Close modal
+            closeModal.addEventListener('click', () => {
+                alertModal.style.display = 'none';
+            });
+
+            // Handle form submission
+            alertForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const moldNumber = document.getElementById('moldNumber').value;
+                const productionLimit = document.getElementById('productionLimit').value;
+                const email = document.getElementById('email').value;
+                const mobile = document.getElementById('mobileNo').value;
+
+                try {
+                    const response = await fetch('http://localhost:3000/api/set-alert', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ moldNumber, productionLimit, email, mobile })
+                    });
+
+                    if (response.ok) {
+                        showPopup('Alert set successfully!', 'You can now close this window.', 'success');
+                        alertModal.style.display = 'none';
+                        alertForm.reset();
+                    } else {
+                        const error = await response.json();
+
+                        showPopup('Error!', `${error.error}`, 'info');
+                    }
+                } catch (error) {
+                    console.error('Error setting alert:', error);
+                    showPopup('Failed to set alert!', 'Please try again.', 'error');
+                }
+            });
+        });
+
+        function showPopup(title, message, type) {
+            const overlay = document.getElementById('popup-overlay');
+            const popup = document.getElementById('popup');
+            const icon = document.getElementById('popup-icon');
+
+            // Set title and message
+            document.getElementById('popup-title').textContent = title;
+            document.getElementById('popup-message').textContent = message;
+
+            // Adjust icon and styles based on type
+            if (type === 'success') {
+                icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                icon.className = 'text-green-600 text-6xl mb-4 animate-bounce';
+            } else if (type === 'error') {
+                icon.innerHTML = '<i class="fas fa-times-circle"></i>';
+                icon.className = 'text-red-600 text-6xl mb-4 animate-bounce';
+            } else if (type === 'info') {
+                icon.innerHTML = '<i class="fas fa-info-circle"></i>';
+                icon.className = 'text-blue-600 text-6xl mb-4 animate-bounce';
+            }
+
+            // Display the pop-up
+            overlay.classList.remove('hidden');
+            setTimeout(() => {
+                popup.classList.remove('scale-75', 'opacity-0');
+            }, 10);
+        }
+
+        function hidePopup() {
+            const overlay = document.getElementById('popup-overlay');
+            const popup = document.getElementById('popup');
+
+            popup.classList.add('scale-75', 'opacity-0');
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+            }, 300);
+        }
+
+        document.addEventListener('DOMContentLoaded', async function () {
+            await fetchNotifications(); // Fetch notifications initially
+            await setInterval(fetchNotifications, 40000); // Fetch notifications every 30 seconds
+        });
+
+        function fetchNotifications() {
+            fetch('http://localhost:3000/api/notifications')
+                .then(response => response.json())
+                .then(notifications => {
+                    const notificationsContainer = document.getElementById('notifications');
+                    notificationsContainer.innerHTML = ''; // Clear existing notifications
+
+                    notifications.forEach(notification => {
+                        const notificationElement = document.createElement('div');
+                        notificationElement.classList.add('notification');
+
+                        // Highlight specific notification types
+                        if (notification.notification_type === 'near_maintenance') {
+                            notificationElement.classList.add('highlight-yellow'); // Add class for yellow styling
+                        } else if (notification.notification_type === 'expiration_soon') {
+                            notificationElement.classList.add('highlight-red'); // Add class for red styling
+                        }
+
+                        // Get icon based on notification type
+                        const iconClass = getIconClass(notification.notification_type);
+
+                        const icon = document.createElement('i');
+                        icon.classList.add('fas', 'notification-icon', iconClass); // Use icon class from notification type
+
+                        const content = document.createElement('div');
+                        content.classList.add('notification-content');
+
+                        const message = document.createElement('p');
+                        message.textContent = notification.message; // Assuming `message` field in the DB
+
+                        const time = document.createElement('p');
+                        time.classList.add('notification-time');
+                        time.textContent = formatDate(notification.date_time); // Format the date_time
+
+                        content.appendChild(message);
+                        content.appendChild(time);
+
+                        notificationElement.appendChild(icon);
+                        notificationElement.appendChild(content);
+
+                        notificationsContainer.appendChild(notificationElement);
+                    });
+                })
+                .catch(err => {
+                    console.error('Error fetching notifications:', err);
+                });
+        }
+
+
+        function getIconClass(notificationType) {
+            // Define icon mapping based on notification type
+            const iconMapping = {
+                'expiration': 'fa-times-circle',        // Icon for expiration notifications
+                'maintenance': 'fa-tools',             // Icon for maintenance notifications
+                'system': 'fa-sync-alt',               // Icon for system updates
+                'alert': 'fa-exclamation-triangle',    // Icon for critical alerts
+                'info': 'fa-info-circle',              // Icon for informational messages
+                'success': 'fa-check-circle',          // Icon for success notifications
+                'expiration_soon': 'fa-exclamation-circle',
+                'near_maintenance': 'fa-clock',           // Icon for warnings
+                'error': 'fa-bug',                     // Icon for errors or issues
+                'reminder': 'fa-calendar-check',       // Icon for reminders
+            };
+
+            // Return the corresponding icon class or a default icon if no match
+            return iconMapping[notificationType] || 'fa-bell'; // Default: bell icon
+        }
+
+        function formatDate(dateString) {
+    const date = new Date(dateString); // Convert the input string to a Date object
+
+    // Convert to IST (Indian Standard Time) using `toLocaleString`
+    const istDate = new Date(date.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+
+    // Get day of the week (e.g., "Sunday")
+    const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dayOfWeek = daysOfWeek[istDate.getDay()];
+
+    // Get day, month, year, and time (HH:MM AM/PM)
+    const day = istDate.getDate();
+    const month = istDate.getMonth() + 1; // Months are zero-indexed, so add 1
+    const year = istDate.getFullYear();
+
+    let hours = istDate.getHours();
+    let minutes = istDate.getMinutes();
+    let ampm = hours >= 12 ? 'PM' : 'AM';
+
+    // Convert 24-hour format to 12-hour format
+    hours = hours % 12;
+    hours = hours ? hours : 12; // The hour '0' should be '12'
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+
+    const time = `${hours}:${minutes} ${ampm}`;
+    return `${dayOfWeek}, ${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
+}
+
+
+
+
+
+        window.onload = async function () {
+            await load_data();
+            await load_weekly_data();
+        };
+    </script>
+</body>
+
+</html>

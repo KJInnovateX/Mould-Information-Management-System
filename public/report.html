@@ -1,0 +1,1149 @@
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <style>
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container-fluid {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1;
+            overflow: auto;
+            /* Enable scrolling */
+            display: flex;
+            flex-direction: column;
+            margin-left: 80px;
+            /* Adjusted to fit sidebar */
+        }
+
+        .card {
+            border-radius: 10px;
+            /* Minimized rounded corners */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            margin-bottom: 10px;
+            /* Reduced margin for spacing */
+        }
+
+        .card-title {
+            font-family: 'Roboto', sans-serif;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 100%;
+            /* Adjusted height for charts */
+            width: 100%;
+        }
+
+        /* Tooltip styling */
+        .apexcharts-tooltip {
+            font-size: 13px;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .btn-group .btn {
+            border-radius: 20px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            /* Reduced gap */
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-item strong {
+            color: #333;
+            font-size: 0.9rem;
+            /* Minimized text size */
+        }
+
+        .info-item span {
+            font-size: 0.9rem;
+            /* Minimized text size */
+        }
+
+        /* Custom styles for the sidebar */
+        #sidebar {
+            width: 70px;
+            background-color: #fcfbfd;
+            color: rgb(74, 72, 72);
+            position: fixed;
+            top: 94px;
+            left: 10px;
+            height: 80%;
+            padding-top: 20px;
+            border-radius: 50%;
+            /* Half-circle shape */
+            transition: width 0.3s, border-radius 0.3s;
+            box-shadow: 5px 5px 20px rgba(0, 247, 255, 0.792);
+            overflow: hidden;
+            z-index: 1000;
+            justify-content: flex-start;
+            box-sizing: border-box;
+        }
+
+        #sidebar.expanded {
+            width: 250px;
+            border-radius: 15px;
+            /* Slightly curved for expansion */
+        }
+
+        #sidebar ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #sidebar ul li {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            text-align: center;
+            transition: background-color 0.3s, color 0.3s;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        #sidebar ul li a {
+            color: rgb(7, 7, 7);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            justify-content: center;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        #sidebar ul li a i {
+            font-size: 30px;
+            margin-left: 10px;
+            /* Increased size for better visibility */
+            margin-right: 10px;
+            /* Add space between icon and text */
+            color: rgb(74, 72, 72);
+        }
+
+        #sidebar.expanded ul li a i {
+            font-size: 32px;
+            /* Larger icon size when sidebar is expanded */
+        }
+
+        #sidebar ul li a span {
+            display: none;
+        }
+
+        #sidebar.expanded ul li a span {
+            display: inline;
+            margin-left: 10px;
+            font-size: 18px;
+            /* Adjust font size for text */
+        }
+
+        #sidebar ul li a:hover {
+            background-color: #a8cbe1;
+            color: rgb(0, 0, 0);
+            border-radius: 10px;
+        }
+
+
+
+        #sidebarToggle {
+            background: none;
+            border: none;
+            color: #00eeff;
+            font-size: 28px;
+            cursor: pointer;
+            position: absolute;
+            top: 100px;
+            left: 21px;
+        }
+
+        main {
+            margin-left: 90px;
+            transition: margin-left 0.6s;
+        }
+
+        #sidebar.expanded+main {
+            margin-left: 270px;
+        }
+
+        @media screen and (max-width: 768px) {
+            #sidebar {
+                width: 60px;
+            }
+
+            #sidebar.expanded {
+                width: 220px;
+            }
+
+            main {
+                margin-left: 60px;
+            }
+
+            #sidebar.expanded+main {
+                margin-left: 200px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            #sidebar {
+                width: 50px;
+            }
+
+            #sidebar.expanded {
+                width: 180px;
+            }
+
+            main {
+                margin-left: 50px;
+            }
+
+            #sidebar.expanded+main {
+                margin-left: 180px;
+            }
+        }
+
+
+        .chart-legend {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .chart-legend span {
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .chart-legend span::before {
+            content: '';
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            margin-right: 5px;
+            border-radius: 2px;
+        }
+
+        .chart-legend .legend-production::before {
+            background-color: rgba(34, 139, 34, 0.6);
+        }
+
+        .chart-legend .legend-maintenance::before {
+            background-color: rgba(255, 165, 0, 0.6);
+        }
+
+        .chart-legend .legend-issues::before {
+            background-color: rgba(220, 20, 60, 0.6);
+        }
+
+        .chart-legend .legend-remaining::before {
+            background-color: rgba(200, 200, 200, 0.6);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .filter {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .filter select {
+            padding: 8px 16px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            background: #f9f9f9;
+            transition: all 0.2s;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            /* Reduced height for a smaller chart */
+            width: 100%;
+        }
+
+        /* Tooltip styling */
+        .apexcharts-tooltip {
+            font-size: 13px;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .filter-card {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #3498db;
+            color: #ffffff;
+
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .filter-card label {
+            font-size: 14px;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .filter-card select {
+            background: #ffffff;
+            color: #3498db;
+            border: none;
+            padding: 5px 10px;
+            font-size: 14px;
+            border-radius: 5px;
+            outline: none;
+            font-weight: bold;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 20px;
+            color: #444;
+            margin-bottom: 10px;
+        }
+
+        canvas {
+            margin-top: 15px;
+        }
+
+
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                /* Ensures images and colors are preserved */
+                print-color-adjust: exact;
+            }
+
+            img {
+                max-width: 100%;
+                /* Ensures images fit within page dimensions */
+            }
+
+            /* Customize the appearance for print as needed */
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 p-2">
+    <div id="backButton" class="fixed top-4 left-4 z-50">
+        <a href="javascript:history.back();" class="flex items-center p-2 rounded-full transition-all duration-300">
+            <img src="https://firebasestorage.googleapis.com/v0/b/tunnel-ac8de.appspot.com/o/icons%2Fundo.png?alt=media&token=64d78468-bdc2-4437-87ca-98b45b6e8e9d"
+                alt="Back Button"
+                class="w-12 h-12 rounded-full transition-all duration-300 hover:border-4 hover:border-black hover:shadow-lg" />
+        </a>
+    </div>
+    <aside id="sidebar">
+        <button id="sidebarToggle"><i class="fas fa-bars"></i></button>
+        <ul>
+            <li><a href="dashboard.html" class="sidebar-item"><i class="fas fa-tachometer-alt"></i><span>
+                        Dashboard</span></a></li>
+            <li><a href="viewMold.html" class="sidebar-item"><i class="fas fa-cogs"></i><span> Mold
+                        Management</span></a></li>
+            <li><a href="dataEntry.html" class="sidebar-item"><i class="fas fa-database"></i><span> Data
+                        Entry</span></a></li>
+            <li>
+                <a href="bulkDataEntry.html" class="sidebar-item">
+                    <i class="fas fa-upload"></i><span> Bulk Data Entry</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+    <div class="container-fluid">
+        <h1 class="text-2xl md:text-3xl font-bold text-center text-gray-800 mb- md:mb-4 pt-2">Mould Analytical Overview
+        </h1>
+
+        <div class="card main-content" style="height: 95vh;">
+
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12 col-lg-6 mb-2">
+                        <!-- Mold Information Card -->
+                        <div class="card h-100" style="height: 45vh;">
+                            <div class="card-body">
+                                <h2 class="card-title text-xl font-semibold mb-3">Mould Information</h2>
+                                <div class="info-grid" id="moldInfoGrid">
+                                    <!-- Mold Information goes here from db -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 mb-2">
+                        <!-- This Week's Overview Card -->
+                        <div class="card h-100" style="height: 45vh;">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h2 class="card-title text-xl font-semibold">Detailed Overview of Mold</h2>
+                                </div>
+                                <div class="flex gap-4 fixed top-4 right-4">
+                                    <!-- Download Button -->
+                                    <div class="relative group">
+                                        <button
+                                            class="w-12 h-12 bg-blue-500 text-white rounded-full shadow-md hover:shadow-lg hover:scale-110 transition-transform"
+                                            onclick="downloadReport()">
+                                            <i class="fas fa-download text-xl"></i>
+                                        </button>
+                                        <span
+                                            class="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 text-white text-sm bg-black rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                                            Download Report
+                                        </span>
+                                    </div>
+
+                                    <!-- Print Button -->
+                                    <div class="relative group">
+                                        <button
+                                            class="w-12 h-12 bg-gray-500 text-white rounded-full shadow-md hover:shadow-lg hover:scale-110 transition-transform"
+                                            onclick="printReport()">
+                                            <i class="fas fa-print text-xl"></i>
+                                        </button>
+                                        <span
+                                            class="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 text-white text-sm bg-black rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                                            Print Report
+                                        </span>
+                                    </div>
+
+                                    <!-- View Data Button -->
+                                    <div class="relative group">
+                                        <button
+                                            class="w-12 h-12 bg-teal-500 text-white rounded-full shadow-md hover:shadow-lg hover:scale-110 transition-transform"
+                                            onclick="toggleTable()">
+                                            <i class="fas fa-eye text-xl"></i>
+                                        </button>
+                                        <span
+                                            class="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 text-white text-sm bg-black rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                                            View Data
+                                        </span>
+                                    </div>
+                                </div>
+
+
+
+                                <div class="row">
+                                    <div class="col-md-4 text-center">
+                                        <h3 class="text-2xl font-semibold text-success" id="moldProduction">loding...
+                                        </h3>
+                                        <p class="text-gray-600">Mould Production</p>
+
+                                    </div>
+                                    <div class="col-md-4 text-center">
+                                        <h3 class="text-2xl font-semibold text-warning" id="moldMaintenance">loading...
+                                        </h3>
+                                        <p class="text-gray-600">Mould Maintenance</p>
+
+                                    </div>
+                                    <div class="col-md-4 text-center">
+                                        <h3 class="text-2xl font-semibold text-primary" id="costUsed">loading...</h3>
+                                        <p class="text-gray-600">Cost Used</p>
+
+                                    </div>
+
+                                    <div class="col-12 my-7 flex justify-center">
+                                        <hr class="border-gray-400 w-1/2 mt-5" />
+                                    </div>
+
+                                    <div class="flex items-center justify-center gap-6 mb-6 p-4">
+                                        <div class="flex items-center gap-4">
+                                            <!-- Operator label and Dropdown -->
+                                            <h2 class="text-xl font-semibold text-gray-800">Operator Performance:</h2>
+                                            <select id="operatorSelect"
+                                                class="p-2 border border-gray-300 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transition">
+                                                <option value="1196">Mohan</option>
+                                                <option value="1197">Mangesh</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Rating Section -->
+                                        <div id="ratingContainer" class="flex items-center gap-3">
+                                            <div id="ratingStars" class="flex gap-1 text-yellow-500 text-[40px]">
+                                                <!-- Dynamic stars will be inserted here -->
+                                            </div>
+                                            <span id="ratingInfo" class="text-sm font-semibold text-gray-600">Not
+                                                Rated</span>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 mb-2">
+                        <!-- Mold Production Activity Card -->
+                        <div class="card h-full flex justify-center items-center">
+                            <div class="card-body text-center flex flex-col items-center w-full">
+                                <div class="filter-card mb-4">
+                                    <select id="filter" class="p-2 border rounded">
+                                        <option value="weekly" selected>Weekly</option>
+                                        <option value="monthly">Monthly</option>
+                                    </select>
+                                </div>
+                                <h2 class="card-title text-xl font-semibold text-left w-full">Production Chart</h2>
+                                <!-- Chart container with fixed height and width -->
+                                <div class="w-full h-[400px] flex justify-center items-center">
+                                    <canvas id="productionChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+
+                    </div>
+                    <div class="col-12 col-lg-6 mb-2">
+                        <!-- Mold Usage Card -->
+                        <!-- Mold Usage Card -->
+                        <div class="card h-100 position-relative">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h2 class="card-title text-xl font-semibold">Mold Usage</h2>
+                                </div>
+                                <!-- Corner Percentage Indicators -->
+                                <div class="corner-labels">
+                                    <div class="corner-label production">
+                                        Production: <b id="productionPercentage">75%</b>
+                                    </div>
+                                    <div class="corner-label remaining">
+                                        Remaining: <b id="remainingPercentage">25%</b>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-center">
+                                    <div class="chart-container" style="width: 80%; height: 50vh;">
+                                        <canvas id="structureChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    </div>
+    </div>
+    </div>
+
+    <div id="popup-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div id="popup"
+            class="bg-white rounded-3xl w-96 h-80 p-8 text-center shadow-lg transform scale-75 opacity-0 transition-transform duration-500 ease-out">
+            <div id="popup-icon" class="text-green-600 text-6xl mb-4 animate-bounce">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2 id="popup-title" class="text-2xl font-bold text-gray-800 mb-2">Title</h2>
+            <p id="popup-message" class="text-lg text-gray-600 mb-6">Message</p>
+            <button
+                class="bg-blue-500 text-white px-5 py-2 rounded-full text-lg shadow hover:bg-blue-700 focus:outline-none transition-transform transform hover:scale-105 active:scale-95"
+                onclick="hidePopup()">Close</button>
+        </div>
+    </div>
+    <style>
+        /* Additional styles for the popup */
+        #popup-overlay {
+            backdrop-filter: blur(5px);
+        }
+
+        #popup {
+            animation: fadeIn 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+    <script>
+        let max_production = 0;  // Default value for max_production
+        let production_cnt = 0;  // Default value for production_cnt
+
+
+
+        const ctx = document.getElementById('productionChart').getContext('2d');
+
+        // Gradient for line chart
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, "rgba(52, 152, 219, 0.7)");
+        gradient.addColorStop(1, "rgba(52, 152, 219, 0)");
+
+        // Initialize current view
+        let currentView = "weekly";
+
+        // Global data variables
+        let productionData = [];
+        let breakdownData = [];
+        let labels = [];
+
+        // Function to fetch dynamic data based on the view
+        async function fetchData(view) {
+            const response = await fetch(`http://localhost:3000/api/production-data?view=${view}&mouldNo=${getQueryParam('mouldNo')}`);
+            const data = await response.json();
+            productionData = data.productionData;
+            breakdownData = data.breakdownData;
+            labels = data.labels;
+            return data;
+        }
+
+        // Function to format date as dd/mm/yyyy
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const day = ('0' + date.getDate()).slice(-2);
+            const month = ('0' + (date.getMonth() + 1)).slice(-2);
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        // Function to update chart data dynamically
+        function updateChart(view, productionData, breakdownData, labels) {
+            productionChart.data.labels = labels.map(date => formatDate(date)); // Format the date labels
+            productionChart.data.datasets[0].data = productionData;
+            productionChart.data.datasets[0].pointBorderColor = updatePointBorders(breakdownData);
+            productionChart.update();
+        }
+
+        // Function to update point borders based on breakdowns
+        function updatePointBorders(breakdownData) {
+            return breakdownData.map(breakdown =>
+                breakdown === 1 ? "#e74c3c" : "#ffffff"  // Red for breakdown, white otherwise
+            );
+        }
+
+        // Create the chart
+        const productionChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: "Production",
+                        data: [],
+                        borderColor: "#3498db",
+                        backgroundColor: gradient,
+                        borderWidth: 3,
+                        tension: 0.4,
+                        pointStyle: "circle",
+                        pointRadius: 6,
+                        pointBackgroundColor: "#3498db",
+                        pointBorderColor: [],
+                        pointBorderWidth: 4,
+                        fill: true,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        labels: {
+                            color: "#555",
+                            font: { size: 14 }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: context => {
+                                const breakdown = breakdownData[context.dataIndex];
+                                const productionValue = context.raw;
+
+                                const breakdownText = breakdown === 1 ? `Breakdown occurred [Breakdown cnt : ${Number(breakdown)}]` : `No breakdown`;
+                                return [
+                                    `${context.dataset.label}: ${productionValue}`,
+                                    `${breakdownText}`,
+                                ];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: "Date",
+                            font: { size: 14 },
+                            color: "#555"
+                        },
+                        ticks: { color: "#555", font: { size: 12 }, autoSkip: currentView === "monthly" },
+                        grid: { display: false }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: "Production Count",
+                            font: { size: 14 },
+                            color: "#555"
+                        },
+                        ticks: { color: "#555", stepSize: 20 },
+                        grid: { color: "rgba(0, 0, 0, 0.1)" }
+                    }
+                }
+            }
+        });
+
+        // Fetch initial data for weekly view and update the chart
+        fetchData("weekly").then(data => {
+            updateChart("weekly", productionData, breakdownData, labels);
+            blinkBreakdownBorders();
+        });
+
+        // Event listener to change the chart view
+        document.getElementById("filter").addEventListener("change", event => {
+            currentView = event.target.value;
+            fetchData(currentView).then(data => {
+                updateChart(currentView, productionData, breakdownData, labels);
+
+            });
+        });
+
+        // Function to blink the breakdown point borders
+        function blinkBreakdownBorders() {
+            let isRedVisible = true;
+
+            setInterval(() => {
+                productionChart.data.datasets[0].pointBorderColor = breakdownData.map(b =>
+                    b === 1 ? (isRedVisible ? "#e74c3c" : "#ffffff") : "#ffffff"
+                );
+                productionChart.update();
+                isRedVisible = !isRedVisible;
+            }, 500); // Alternate every 500ms
+        }
+
+        // Call the blink function for breakdowns once the data is loaded
+        fetchData("weekly");
+
+
+
+        // pie
+        async function loadPie() {
+            try {
+                // Fetch data from the API endpoint
+                const response = await fetch(`http://localhost:3000/api/fetch-pie/${moldNo}`);
+
+                // Check if the response is successful
+                if (!response.ok) {
+                    console.error(`Failed to fetch data for mold_id ${moldNo}:`, response.statusText);
+                    return; // Exit the function if there's an error
+                }
+
+                // Parse the response JSON
+                const data = await response.json();
+
+                // Extract production count and max production
+                const production_cnt = data.production_cnt || 0; // Default to 0 if missing
+                const max_production = data.maxproduction || 0; // Default to 0 if missing
+
+                // Validate if production_cnt and max_production are valid numbers
+                if (isNaN(production_cnt) || isNaN(max_production) || max_production === 0) {
+                    console.error('Invalid values for production_cnt or max_production');
+                    return; // Exit the function early if values are invalid
+                }
+
+                // Calculate the production percentage and remaining percentage
+                const productionPercentage = (production_cnt / max_production) * 100;
+                const remainingPercentage = 100 - productionPercentage;
+
+                console.log(productionPercentage);
+                console.log(remainingPercentage);
+
+                // Update the displayed percentages (optional)
+                document.getElementById('productionPercentage').innerText = `${productionPercentage.toFixed(2)}%`;
+                document.getElementById('remainingPercentage').innerText = `${remainingPercentage.toFixed(2)}%`;
+
+                // Get the chart context
+                const ctx2 = document.getElementById('structureChart').getContext('2d');
+
+                // Create gradients for Used and Remaining Molds
+                const gradientUsed = ctx2.createLinearGradient(0, 0, 0, 400);
+                gradientUsed.addColorStop(0, 'rgba(41, 128, 185, 0.9)');  // Darker Start (Used Molds)
+                gradientUsed.addColorStop(1, 'rgba(52, 152, 219, 0.9)');  // Darker End (Used Molds)
+
+                const gradientRemaining = ctx2.createLinearGradient(0, 0, 0, 400);
+                gradientRemaining.addColorStop(0, 'rgba(169, 169, 169, 0.8)');  // Darker Start (Remaining Molds)
+                gradientRemaining.addColorStop(1, 'rgba(41, 128, 185, 0.9)');  // Darker End (Remaining Molds)
+
+                // Create the chart
+                const structureChart = new Chart(ctx2, {
+                    type: 'pie',
+                    data: {
+                        labels: [
+                            `Used Molds - ${productionPercentage.toFixed(2)}%`,
+                            `Remaining Molds - ${remainingPercentage.toFixed(2)}%`,
+                        ],
+                        datasets: [{
+                            data: [productionPercentage, remainingPercentage],  // Used and Remaining Molds Data
+                            backgroundColor: [
+                                gradientUsed,   // Gradient for Used Molds
+                                gradientRemaining,  // Gradient for Remaining Molds
+                            ],
+                            hoverBackgroundColor: [
+                                'rgba(52, 152, 219, 0.7)',  // Lighter hover for Used Molds
+                                'rgba(189, 189, 189, 0.7)',  // Lighter hover for Remaining Molds
+                            ],
+                            hoverBorderColor: "rgba(234, 236, 244, 1)",
+                            borderWidth: 3,
+                            hoverOffset: 10,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'right',  // Keep the legend on the right
+                                labels: {
+                                    fontColor: '#2c3e50',
+                                    fontSize: 14,  // Increase font size for legend
+                                    padding: 30,   // Increase padding for better spacing
+                                    boxWidth: 25,   // Increase box width for better visibility
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (tooltipItem) {
+                                        return tooltipItem.raw.toFixed(2) + '%';
+                                    }
+                                }
+                            },
+                            datalabels: {
+                                display: true,
+                                formatter: function (value, context) {
+                                    const label = context.chart.data.labels[context.dataIndex];
+                                    const rawValue = context.raw;
+                                    const percentage = rawValue.toFixed(2) + '%';
+                                    return `${label}: ${percentage}`;
+                                },
+                                color: '#fff',
+                                font: {
+                                    weight: 'bold',
+                                    size: 16, // Increased font size for data labels
+                                    family: 'Roboto',
+                                },
+                                padding: 10,
+                                align: 'center',
+                                anchor: 'center',
+                                offset: 10,
+                                shadowColor: '#000',
+                                shadowBlur: 5,
+                                shadowOffsetX: 2,
+                                shadowOffsetY: 2,
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading pie chart:', error);
+            }
+        }
+
+
+
+
+        document.getElementById('sidebarToggle').addEventListener('click', () => {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('expanded');
+        });
+
+        function downloadReport() {
+            // Select the content you want to capture
+            window.print();
+
+
+
+        }
+
+
+
+
+        const moldNo = getQueryParam('mouldNo');
+
+        function toggleTable() {
+            // Navigate to the report viewData page with moldNo as a query parameter
+            window.location.href = `/viewData.html?moldNo=${moldNo}`;
+        }
+
+        function printReport() {
+            window.print();
+        }
+
+
+
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // Function to fetch mold data and display it
+        async function loadMoldData() {
+            // Get moldNo from the URL
+
+            if (moldNo) {
+                // Fetch data from the backend using moldNo
+                fetch(`http://localhost:3000/api/getmold/${moldNo}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Mould data not found');
+                        }
+                        return response.json(); // Parse the response JSON only once
+                    })
+                    .then(data => {
+                        // Debug: Log the fetched data
+                        console.log('Fetched mould data:', data);
+                        max_production = Number(data.lifespan); // Ensure it is a number
+
+
+
+                        // Populate the information in the card
+                        const formattedDate = new Date(data.date).toLocaleDateString();
+                        // Target date
+                        const targetDate = new Date(formattedDate);
+
+                        // Current date
+                        const currentDate = new Date();
+
+                        // Calculate the difference in milliseconds
+                        const differenceInMs = currentDate - targetDate;
+
+                        // Convert milliseconds to days
+                        const differenceInDays = Math.floor(differenceInMs / (1000 * 60 * 60 * 24));
+
+                        // Display the result
+                        console.log(`The difference in days is: ${differenceInDays}`);
+                        // Adjust as needed
+                        const moldInfoGrid = document.getElementById('moldInfoGrid');
+                        moldInfoGrid.innerHTML = `
+                    <div class="info-item">
+                        <strong>Mould Number:</strong>
+                        <span>${data.moldNo || 'N/A'}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Date:</strong>
+                        <span>${formattedDate || 'N/A'}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Lifespan:</strong>
+                        <span>${data.lifespan || 'N/A'} Unit's</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Status:</strong>
+                        <span>${data.status || 'N/A'}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Mould Manufacturer:</strong>
+                        <span>${data.moldManufacturerName || 'N/A'}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Manufacturer Contact:</strong>
+                        <span>${data.manufacturerContact || 'N/A'}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Mould Added By:</strong>
+                        <span>${data.moldAddedBy || 'N/A'}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Type of Mold:</strong>
+                        <span>${data.moldType || 'N/A'}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Maintenance on each :</strong>
+                        <span>${data.maintainanceAlert || 'N/A'} Unit's</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Mould Lifecycle :</strong>
+                        <span>${differenceInDays || 'N/A'} Day's</span>
+                    </div>
+
+
+                `;
+                    })
+                    .catch(error => {
+                        console.error('Error fetching mold data:', error);
+                        showPopup('Error loading mould data',error.message,'error');
+                    });
+            } else {
+                showPopup('Mould number is missing in the URL!','Go back end re-enter the report.','error');
+                
+            }
+        }
+
+        async function load_week_data() {
+            // Ensure that the moldNumber is properly passed into the URL
+            fetch(`http://localhost:3000/api/get-weekly-data/${moldNo}`)
+                .then(response => response.json())
+                .then(data => {
+                    production_cnt = Number(data.productionCount);
+                    // Populate the dashboard with dynamic data
+                    document.getElementById('moldProduction').innerText = data.productionCount + " Units";
+                    document.getElementById('moldMaintenance').innerText = data.maintenanceCount;
+                    document.getElementById('costUsed').innerText = `₹ ${data.totalCost.toFixed(2)}`;
+                    console.log(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+
+        }
+
+        function rating() {
+            // Performance ratings for operators
+            const performanceRatings = {
+                "1196": 4, // Mohan - 4 stars
+                "1197": 3, // Mangesh - 3 stars
+                // Add more operators as needed
+            };
+
+            // DOM Elements
+            const operatorSelect = document.getElementById("operatorSelect");
+            const ratingStars = document.getElementById("ratingStars");
+            const ratingInfo = document.getElementById("ratingInfo");
+
+            // Function to update the rating display
+            function updateRating(operatorId) {
+                const rating = performanceRatings[operatorId] || 0;
+                const stars = Array.from({ length: 5 }, (_, i) =>
+                    i < rating ? "★" : "☆"
+                ).join("");
+
+                // Update DOM
+                if (ratingStars) {
+                    ratingStars.textContent = stars;
+                }
+
+                if (ratingInfo) {
+                    ratingInfo.textContent = `(${rating} Stars)`;
+                }
+            }
+
+            // Listen to dropdown changes
+            if (operatorSelect) {
+                operatorSelect.addEventListener("change", (event) => {
+                    updateRating(event.target.value);
+                });
+
+                // Initialize with the first operator
+                updateRating(operatorSelect.value);
+            }
+        }
+
+        function showPopup(title, message, type) {
+            const overlay = document.getElementById('popup-overlay');
+            const popup = document.getElementById('popup');
+            const icon = document.getElementById('popup-icon');
+
+            // Set title and message
+            document.getElementById('popup-title').textContent = title;
+            document.getElementById('popup-message').textContent = message;
+
+            // Adjust icon and styles based on type
+            if (type === 'success') {
+                icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                icon.className = 'text-green-600 text-6xl mb-4 animate-bounce';
+            } else if (type === 'error') {
+                icon.innerHTML = '<i class="fas fa-times-circle"></i>';
+                icon.className = 'text-red-600 text-6xl mb-4 animate-bounce';
+            } else if (type === 'info') {
+                icon.innerHTML = '<i class="fas fa-info-circle"></i>';
+                icon.className = 'text-blue-600 text-6xl mb-4 animate-bounce';
+            }
+
+            // Display the pop-up
+            overlay.classList.remove('hidden');
+            setTimeout(() => {
+                popup.classList.remove('scale-75', 'opacity-0');
+            }, 10);
+        }
+
+        function hidePopup() {
+            const overlay = document.getElementById('popup-overlay');
+            const popup = document.getElementById('popup');
+
+            popup.classList.add('scale-75', 'opacity-0');
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+            }, 300);
+        }
+
+
+
+        // Utility function to get query parameters from the URL
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // Call the function to load mold data when the page loads
+        window.onload = async function () {
+            await loadMoldData();
+            await load_week_data();
+            await fetchData("weekly");
+            await loadPie();
+            await rating();
+
+        };
+
+
+    </script>
+</body>
+
+</html>

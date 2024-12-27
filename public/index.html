@@ -1,0 +1,387 @@
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>
+        Login Page
+    </title>
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&amp;family=Raleway:wght@700&amp;display=swap"
+        rel="stylesheet" />
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #00eeff 0%, #0077ff 100%);
+            position: relative;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .input-field {
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            border-color: #00eeff;
+            box-shadow: 0 0 10px rgba(0, 238, 255, 0.5);
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, #00eeff 0%, #0077ff 100%);
+            transition: all 0.3s ease;
+        }
+
+        .btn-gradient:hover {
+            background: linear-gradient(135deg, #0077ff 0%, #00eeff 100%);
+            box-shadow: 0 0 10px rgba(0, 238, 255, 0.5);
+        }
+
+        .welcome-text {
+            font-family: 'Raleway', sans-serif;
+        }
+
+        .welcome-subtext {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .footer {
+            font-family: 'Poppins', sans-serif;
+            background: rgba(80, 161, 254, 0.9);
+            color: rgb(42, 42, 42);
+            padding: 2px;
+            text-align: center;
+            align-items: center;
+            position: absolute;
+            bottom: 0;
+
+            width: 100%;
+            font-weight: 600;
+        }
+
+        .background-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.05;
+            width: 90%;
+            height: auto;
+        }
+
+        /* Reduce the height of the card */
+        .card {
+            max-height: 600px;
+            /* Adjust this value to decrease the height */
+        }
+
+        .form-container {
+            height: 90%;
+            /* Adjust the height of the form container */
+            overflow-y: auto;
+            /* Allow scroll if content overflows */
+        }
+
+        .form-section {
+            margin-bottom: 10px;
+            /* Reduce space between form sections */
+        }
+
+        .button-section {
+            margin-top: 10px;
+            /* Reduce space between buttons */
+        }
+    </style>
+</head>
+
+<body class="flex items-center justify-center min-h-screen bg-gray-100 overflow-hidden relative">
+    <div class="flex w-full max-w-4xl bg-white shadow-lg rounded-lg overflow-hidden card">
+        <div class="w-1/2 p-8 form-container">
+            <div class="flex justify-center mb-8">
+                <img alt="Company Logo" class="w-16 h-16" height="100"
+                    src="https://firebasestorage.googleapis.com/v0/b/tunnel-ac8de.appspot.com/o/icons%2FWhatsApp%20Image%202024-12-22%20at%2012.09.39_51027079%20(1).jpg?alt=media&token=6354ff03-99c8-493d-9a29-f20ea5fc8432"
+                    width="100" />
+            </div>
+            <form id="login-form">
+                <div class="form-section mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="company-id">
+                        COMPANY ID
+                    </label>
+                    <input
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline input-field"
+                        id="company-id" type="text" required placeholder="e.g 1104A" />
+                </div>
+                <div class="form-section mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="email">
+                        EMAIL
+                    </label>
+                    <input
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline input-field"
+                        id="email" type="email" value="" required placeholder="e.g user@gmail.com" />
+                </div>
+                <div class="form-section mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
+                        PASSWORD
+                    </label>
+                    <input
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline input-field"
+                        id="password" type="password" value="" required />
+                </div>
+                <div class="form-section mb-4">
+                    <label class="inline-flex items-center">
+                        <input class="form-checkbox text-indigo-600" type="checkbox" />
+                        <span class="ml-2 text-gray-700">
+                            Remember Me
+                        </span>
+                    </label>
+                </div>
+                <div class="button-section flex items-center justify-between mb-4">
+                    <button
+                        class="btn-gradient text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline"
+                        type="submit">
+                        LOGIN
+                    </button>
+                    <button
+                        class="border border-blue-500 text-blue-500 font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline"
+                        onclick="showCreateAccount()" type="button">
+                        CREATE ACCOUNT
+                    </button>
+                </div>
+            </form>
+            <form class="hidden" id="create-account-form">
+                <div class="form-section mb-2">
+                    <label class="block text-gray-700 text-sm font-bold mb-1" for="name">
+                        NAME
+                    </label>
+                    <input
+                        class="shadow appearance-none border rounded w-full py-1.5 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline input-field"
+                        id="name" type="text" required />
+                </div>
+                <div class="form-section mb-2">
+                    <label class="block text-gray-700 text-sm font-bold mb-1" for="company-id-create">
+                        COMPANY ID
+                    </label>
+                    <input
+                        class="shadow appearance-none border rounded w-full py-1.5 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline input-field"
+                        id="company-id-create" type="text" required />
+                </div>
+                <div class="form-section mb-2">
+                    <label class="block text-gray-700 text-sm font-bold mb-1" for="email-create">
+                        EMAIL ID
+                    </label>
+                    <input
+                        class="shadow appearance-none border rounded w-full py-1.5 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline input-field"
+                        id="email-create" type="email" required />
+                </div>
+                <div class="form-section mb-2">
+                    <label class="block text-gray-700 text-sm font-bold mb-1" for="mobile-create">
+                        MOBILE NUMBER
+                    </label>
+                    <input
+                        class="shadow appearance-none border rounded w-full py-1.5 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline input-field"
+                        id="mobile-create" type="tel" pattern="[0-9]{10}" required />
+                </div>
+                <div class="form-section mb-2">
+                    <label class="block text-gray-700 text-sm font-bold mb-1" for="password-create">
+                        PASSWORD
+                    </label>
+                    <input
+                        class="shadow appearance-none border rounded w-full py-1.5 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline input-field"
+                        id="password-create" type="password" required />
+                </div>
+                <div class="form-section mb-2">
+                    <label class="block text-gray-700 text-sm font-bold mb-1" for="confirm-password">
+                        CONFIRM PASSWORD
+                    </label>
+                    <input
+                        class="shadow appearance-none border rounded w-full py-1.5 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline input-field"
+                        id="confirm-password" type="password" required />
+                </div>
+                <div class="button-section flex items-center justify-between mt-2">
+                    <button
+                        class="btn-gradient text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline"
+                        type="submit">
+                        CREATE ACCOUNT
+                    </button>
+                    <button
+                        class="border border-blue-500 text-blue-500 font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline"
+                        onclick="showLogin()" type="button">
+                        BACK TO LOGIN
+                    </button>
+                </div>
+            </form>
+
+        </div>
+        <div class="w-1/2 gradient-bg text-white flex items-center justify-center p-8 relative">
+            <img alt="Background Logo" class="background-logo" height="800"
+                src="https://firebasestorage.googleapis.com/v0/b/tunnel-ac8de.appspot.com/o/icons%2FWhatsApp%20Image%202024-12-22%20at%2012.09.39_51027079%20(1).jpg?alt=media&token=6354ff03-99c8-493d-9a29-f20ea5fc8432"
+                width="800" />
+            <div class="text-center welcome-text relative z-10">
+                <h2 class="text-2xl font-bold mb-2 welcome-subtext">
+                    WELCOME TO
+                </h2>
+                <h1 class="text-4xl font-bold mb-4">
+                    Digital Mould Operation System
+                </h1>
+                <p class="text-lg welcome-subtext">
+                    Login to Access Dashboard
+                </p>
+            </div>
+        </div>
+    </div>
+    <footer class="footer">
+        <p>
+            © 2024 Powered by the brilliance of Team InnoSphere.
+        </p>
+    </footer>
+
+    <div id="popup-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div id="popup"
+            class="bg-white rounded-3xl w-96 h-80 p-8 text-center shadow-lg transform scale-75 opacity-0 transition-transform duration-500 ease-out">
+            <div id="popup-icon" class="text-green-600 text-6xl mb-4 animate-bounce">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2 id="popup-title" class="text-2xl font-bold text-gray-800 mb-2">Title</h2>
+            <p id="popup-message" class="text-lg text-gray-600 mb-6">Message</p>
+            <button
+                class="bg-blue-500 text-white px-5 py-2 rounded-full text-lg shadow hover:bg-blue-700 focus:outline-none transition-transform transform hover:scale-105 active:scale-95"
+                onclick="hidePopup()">Close</button>
+        </div>
+    </div>
+    <style>
+        /* Additional styles for the popup */
+        #popup-overlay {
+            backdrop-filter: blur(5px);
+        }
+
+        #popup {
+            animation: fadeIn 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+
+    <script>
+
+        function showPopup(title, message, type) {
+            const overlay = document.getElementById('popup-overlay');
+            const popup = document.getElementById('popup');
+            const icon = document.getElementById('popup-icon');
+
+            // Set title and message
+            document.getElementById('popup-title').textContent = title;
+            document.getElementById('popup-message').textContent = message;
+
+            // Adjust icon and styles based on type
+            if (type === 'success') {
+                icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                icon.className = 'text-green-600 text-6xl mb-4 animate-bounce';
+            } else if (type === 'error') {
+                icon.innerHTML = '<i class="fas fa-times-circle"></i>';
+                icon.className = 'text-red-600 text-6xl mb-4 animate-bounce';
+            } else if (type === 'info') {
+                icon.innerHTML = '<i class="fas fa-info-circle"></i>';
+                icon.className = 'text-blue-600 text-6xl mb-4 animate-bounce';
+            }
+
+            // Display the pop-up
+            overlay.classList.remove('hidden');
+            setTimeout(() => {
+                popup.classList.remove('scale-75', 'opacity-0');
+            }, 10);
+        }
+
+        function hidePopup() {
+            const overlay = document.getElementById('popup-overlay');
+            const popup = document.getElementById('popup');
+
+            popup.classList.add('scale-75', 'opacity-0');
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+            }, 300);
+        }
+
+        // Handle login form submission
+        document.getElementById('login-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            const response = await fetch('http://localhost:3000/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                localStorage.setItem('companyId', result.companyId);
+                showPopup('Login Successfully!', 'Redirecting to dashboard...', 'success');
+                setInterval(() => {
+                    window.location.href = "dashboard.html"; // Redirect
+                }, 5000);
+
+            } else {
+                showPopup('Login Failed!', `${result.message}`, 'error');
+                // Show error message
+            }
+        });
+
+        // Handle create account form submission
+        document.getElementById('create-account-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const company_id = document.getElementById('company-id-create').value;
+            const email = document.getElementById('email-create').value;
+            const mobile_number = document.getElementById('mobile-create').value;
+            const password = document.getElementById('password-create').value;
+            const confirm_password = document.getElementById('confirm-password').value;
+
+            const response = await fetch('http://localhost:3000/create-account', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, company_id, email, mobile_number, password, confirm_password })
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                showPopup('Registration Successfully!', 'Redirecting to Login...', 'success');
+                setInterval(() => {
+                    showLogin(); // Replace with the desired URL
+                }, 4000);
+                 // Redirect to login page
+            } else {
+                showPopup('Registration Failed!', `${result.message}`, 'error'); // Show error message
+            }
+        });
+
+
+        function showCreateAccount() {
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('create-account-form').classList.remove('hidden');
+        }
+
+        function showLogin() {
+            document.getElementById('create-account-form').classList.add('hidden');
+            document.getElementById('login-form').classList.remove('hidden');
+        }
+    </script>
+</body>
+
+</html>

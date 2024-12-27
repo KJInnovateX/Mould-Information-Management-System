@@ -1,0 +1,637 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mold Details Table</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Custom styles for the sidebar */
+        #sidebar {
+            width: 70px;
+            background-color: #fcfbfd;
+            color: rgb(74, 72, 72);
+            position: fixed;
+            top: 94px;
+            left: 10px;
+            height: 80%;
+            padding-top: 20px;
+            border-radius: 50%;
+            /* Half-circle shape */
+            transition: width 0.3s, border-radius 0.3s;
+            box-shadow: 5px 5px 20px rgba(0, 247, 255, 0.792);
+            overflow: hidden;
+            z-index: 1000;
+            justify-content: flex-start;
+            box-sizing: border-box;
+        }
+
+        #sidebar.expanded {
+            width: 250px;
+            border-radius: 15px;
+            /* Slightly curved for expansion */
+        }
+
+        #sidebar ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #sidebar ul li {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            text-align: center;
+            transition: background-color 0.3s, color 0.3s;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        #sidebar ul li a {
+            color: rgb(7, 7, 7);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            justify-content: center;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        #sidebar ul li a i {
+            font-size: 30px;
+            margin-left: 10px;
+            /* Increased size for better visibility */
+            margin-right: 10px;
+            /* Add space between icon and text */
+            color: rgb(74, 72, 72);
+        }
+
+        #sidebar.expanded ul li a i {
+            font-size: 32px;
+            /* Larger icon size when sidebar is expanded */
+        }
+
+        #sidebar ul li a span {
+            display: none;
+        }
+
+        #sidebar.expanded ul li a span {
+            display: inline;
+            margin-left: 10px;
+            font-size: 18px;
+            /* Adjust font size for text */
+        }
+
+        #sidebar ul li a:hover {
+            background-color: #a8cbe1;
+            color: rgb(0, 0, 0);
+            border-radius: 10px;
+        }
+
+
+
+        #sidebarToggle {
+            background: none;
+            border: none;
+            color: #00eeff;
+            font-size: 28px;
+            cursor: pointer;
+            position: absolute;
+            top: 100px;
+            left: 21px;
+        }
+
+        main {
+            margin-left: 90px;
+            transition: margin-left 0.6s;
+        }
+
+        #sidebar.expanded+main {
+            margin-left: 270px;
+        }
+
+        @media screen and (max-width: 768px) {
+            #sidebar {
+                width: 60px;
+            }
+
+            #sidebar.expanded {
+                width: 220px;
+            }
+
+            main {
+                margin-left: 60px;
+            }
+
+            #sidebar.expanded+main {
+                margin-left: 200px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            #sidebar {
+                width: 50px;
+            }
+
+            #sidebar.expanded {
+                width: 180px;
+            }
+
+            main {
+                margin-left: 50px;
+            }
+
+            #sidebar.expanded+main {
+                margin-left: 180px;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex">
+    <div id="backButton" class="fixed top-4 left-4 z-50">
+        <a href="javascript:history.back();" class="flex items-center p-2 rounded-full transition-all duration-300">
+            <img src="https://firebasestorage.googleapis.com/v0/b/tunnel-ac8de.appspot.com/o/icons%2Fundo.png?alt=media&token=64d78468-bdc2-4437-87ca-98b45b6e8e9d"
+                alt="Back Button"
+                class="w-12 h-12 rounded-full transition-all duration-300 hover:border-4 hover:border-black hover:shadow-lg" />
+        </a>
+    </div>
+    <aside id="sidebar">
+        <button id="sidebarToggle"><i class="fas fa-bars"></i></button>
+        <ul>
+            <li><a href="dashboard.html" class="sidebar-item"><i class="fas fa-tachometer-alt"></i><span>
+                        Dashboard</span></a></li>
+            <li><a href="viewMold.html" class="sidebar-item"><i class="fas fa-cogs"></i><span> Mould
+                        Management</span></a></li>
+            <li><a href="dataEntry.html" class="sidebar-item"><i class="fas fa-database"></i><span> Data
+                        Entry</span></a></li>
+            <li>
+                <a href="bulkDataEntry.html" class="sidebar-item">
+                    <i class="fas fa-upload"></i><span> Bulk Data Entry</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+    <div class="flex-1 flex flex-col">
+        <main class="p-4 md:p-8 transition-all duration-300">
+
+            <div class="relative w-full bg-white p-4 md:p-8 rounded-lg shadow-lg mx-auto">
+                <div class="absolute top-4 right-4 flex items-center space-x-2">
+                    <button id="search-toggle" class="text-gray-500">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <!-- Remove the hidden class to keep the search bar always expanded -->
+                    <input id="search-bar" class="search-bar bg-gray-200 rounded px-2 py-1 search-bar-expanded"
+                        type="text" placeholder="Enter Mould Number" />
+                </div>
+
+                <h1 class="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-4 md:mb-6">Mould's Details
+                </h1>
+
+                <div class="max-h-[500px] overflow-y-auto border border-gray-300 rounded-lg">
+                    <table class="min-w-full bg-white text-center border-collapse">
+                        <thead class="bg-gray-200 sticky top-0">
+                            <tr>
+                                <th class="py-3 px-4 border-b text-gray-700">Mould No.</th>
+                                <th class="py-3 px-4 border-b text-gray-700">Date and Time</th>
+                                <th class="py-3 px-4 border-b text-gray-700">Max Production Count</th>
+                                <th class="py-3 px-4 border-b text-gray-700">
+                                    <div class="mb-1">
+                                        <select id="statusFilter"
+                                            class="py-3 px-2 border border-gray-300 rounded-lg text-gray-700">
+                                            <option value="all">Status</option>
+                                            <option value="Active">Active</option>
+                                            <option value="Inactive">Inactive</option>
+                                            <option value="Under Maintenance">Under Maintenance</option>
+                                        </select>
+                                    </div>
+                                </th>
+                                <th class="py-3 px-4 border-b text-gray-700">Update Details</th>
+                                <th class="py-3 px-4 border-b text-gray-700">Detailed Report</th>
+                            </tr>
+                        </thead>
+                        <tbody id="moldDataBody" class="overflow-y-auto min-h-full">
+                            <!-- Data will be injected here dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for Adding/Updating Mold -->
+    <div id="addMoldModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2 id="formTitle" style="text-align: center; font-weight: bold;">Mould Details Form</h2>
+            <form id="moldForm" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between;">
+                <div style="flex: 1 1 calc(50% - 10px);">
+                    <label for="mouldType">Mould Type:</label>
+                    <input type="text" id="mouldType" name="mouldType" required>
+                </div>
+                <div style="flex: 1 1 calc(50% - 10px);">
+                    <label for="mouldNo">Mould No:</label>
+                    <input type="text" id="mouldNo" name="mouldNo" required>
+                </div>
+                <div style="flex: 1 1 calc(50% - 10px);">
+                    <label for="date">Date:</label>
+                    <input type="datetime-local" id="date" name="date" required>
+                </div>
+                <div style="flex: 1 1 calc(50% - 10px);">
+                    <label for="lifespan">Max Production Count:</label>
+                    <input type="text" id="lifespan" name="lifespan" required>
+                </div>
+                <div style="flex: 1 1 calc(50% - 10px);">
+                    <label for="status">Status:</label>
+                    <select id="status" name="status" required>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                        <option value="Under Maintenance">Under Maintenance</option>
+                    </select>
+                </div>
+                <div style="flex: 1 1 calc(50% - 10px);">
+                    <label for="maintainanceAlert">Maintenance Alert (Product Count):</label>
+                    <input type="text" id="maintainanceAlert" name="maintainanceAlert" required>
+                </div>
+                <div style="flex: 1 1 calc(50% - 10px);">
+                    <label for="mouldManufacturerName">Mould Manufacturer Name:</label>
+                    <input type="text" id="mouldManufacturerName" name="mouldManufacturerName" required>
+                </div>
+                <div style="flex: 1 1 calc(50% - 10px);">
+                    <label for="manufacturerContact">Manufacturer Contact:</label>
+                    <input type="text" id="manufacturerContact" name="manufacturerContact" required>
+                </div>
+                <div style="flex: 1 1 calc(50% - 10px);">
+                    <label for="mouldAddedBy">Mould Added By (Name of Operator):</label>
+                    <input type="text" id="mouldAddedBy" name="mouldAddedBy" required>
+                </div>
+                <div style="flex: 1 1 100%;">
+                    <label for="remark">Remark:</label>
+                    <textarea id="remark" name="remark" style="width: 100%; height: 60px;" required></textarea>
+                </div>
+                <div style="flex: 1 1 100%; text-align: center;">
+                    <button type="submit" id="submitBtn"
+                        style="background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">Update
+                        Mould</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add some basic CSS for the modal -->
+    <style>
+        .modal {
+            display: none;
+            /* Hidden by default */
+            position: fixed;
+            /* Stay in place */
+            z-index: 1000;
+            /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%;
+            /* Full width */
+            height: 100%;
+            /* Full height */
+            background-color: rgba(0, 0, 0, 0.4);
+            /* Black with opacity */
+            overflow: hidden;
+        }
+
+        .modal-content {
+            background-color: #f9f9f9;
+            margin: 5% auto;
+            /* Center the modal */
+            padding: 20px;
+            border: 1px solid #ddd;
+            width: 80%;
+            /* Modal width */
+            max-width: 700px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+
+            /* Scrollbar setup */
+            max-height: 80vh;
+            /* Modal max height */
+            overflow-y: auto;
+            /* Enable vertical scrolling */
+        }
+
+        .modal-content label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .modal-content input,
+        .modal-content select,
+        .modal-content textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-btn:hover,
+        .close-btn:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+        /* Add scroll bar styles for better UX */
+        .modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background-color: #ccc;
+            border-radius: 5px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb:hover {
+            background-color: #aaa;
+        }
+    </style>
+
+<div id="popup-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-1500">
+    <div id="popup"
+        class="bg-white rounded-3xl w-96 h-80 p-8 text-center shadow-lg transform scale-75 opacity-0 transition-transform duration-500 ease-out">
+        <div id="popup-icon" class="text-green-600 text-6xl mb-4 animate-bounce">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h2 id="popup-title" class="text-2xl font-bold text-gray-800 mb-2">Title</h2>
+        <p id="popup-message" class="text-lg text-gray-600 mb-6">Message</p>
+        <button
+            class="bg-blue-500 text-white px-5 py-2 rounded-full text-lg shadow hover:bg-blue-700 focus:outline-none transition-transform transform hover:scale-105 active:scale-95"
+            onclick="hidePopup()">Close</button>
+    </div>
+</div>
+<style>
+    /* Additional styles for the popup */
+    #popup-overlay {
+        backdrop-filter: blur(5px);
+    }
+
+    #popup {
+        animation: fadeIn 0.5s forwards;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+
+    <script>
+        document.getElementById('sidebarToggle').addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('expanded');
+            document.querySelector('main').classList.toggle('expanded');
+        });
+        // Function to fetch and display mold data from the backend
+        async function fetchMolds() {
+            try {
+                const selectedStatus = document.getElementById('statusFilter').value;
+                const response = await fetch(`http://localhost:3000/api/getmolds?status=${selectedStatus}`);
+                const data = await response.json();
+
+                const tableBody = document.getElementById('moldDataBody');
+                tableBody.innerHTML = '';  // Clear existing rows
+
+                // Populate the table with filtered mold data
+                data.forEach(mold => {
+                    const dateString = mold.date;  // Assuming 'date' is the field name, change if necessary
+                    const date = new Date(dateString);
+
+                    // Convert to local time
+                    const formattedDate = date.toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: false,  // 24-hour format
+                    });
+
+                    const row = document.createElement('tr');
+                    row.classList.add('text-gray-700');
+                    row.innerHTML = `
+                <td class="py-2 md:py-3 px-2 md:px-4 border-b text-center">${mold.moldNo}</td>
+                <td class="py-2 md:py-3 px-2 md:px-4 border-b text-center">${formattedDate}</td>
+                <td class="py-2 md:py-3 px-2 md:px-4 border-b text-center">${mold.lifespan}</td>
+                <td class="py-2 md:py-3 px-2 md:px-4 border-b text-center">${mold.status}</td>
+                <td class="py-2 md:py-3 px-2 md:px-4 border-b text-center">
+                    <button id="${mold.moldNo}" class="bg-blue-500 text-white px-2 md:px-4 py-1 md:py-2 rounded" onclick="openUpdateForm('${mold.moldNo}')">Update</button>
+                </td>
+                <td class="py-2 md:py-3 px-2 md:px-4 border-b text-center">
+                    <button class="bg-green-500 text-white px-2 md:px-4 py-1 md:py-2 rounded" onclick="openReport('${mold.moldNo}')">View Report</button>
+                </td>
+            `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error fetching molds:', error);
+            }
+        }
+
+        // Event listener to handle the filter selection
+        document.getElementById('statusFilter').addEventListener('change', function () {
+            fetchMolds();  // Re-fetch and filter molds based on the selected status
+        });
+
+        // Initial fetch to display all data when the page loads
+        fetchMolds();
+
+        document.getElementById('search-toggle').addEventListener('click', function () {
+            searchMould();
+        });
+
+        document.getElementById('search-bar').addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') { // Check if the "Enter" key was pressed
+                searchMould();
+            }
+        });
+
+        function searchMould() {
+            const searchBar = document.getElementById('search-bar');
+            const mouldId = searchBar.value.trim(); // Get the input value and trim whitespace
+            searchBar.value = '';
+
+            if (mouldId) {
+                // Redirect to the report page with the mould ID as a query parameter
+                window.location.href = `/report.html?mouldNo=${mouldId}`;
+            } else {
+                showPopup('Failed to search!', 'Please enter a valid Mould Number.', 'info');
+            }
+        }
+
+
+        // Call the function on page load
+        window.onload = fetchMolds;
+
+        function openReport(moldNo) {
+            // Navigate to the report page with moldNo as a query parameter
+            window.location.href = `/report.html?mouldNo=${moldNo}`;
+        }
+        // Function to open the modal with the data of the selected mold
+        function openUpdateForm(moldNo) {
+            // Fetch mold data by moldNo (Assuming the moldNo is unique)
+            fetch(`http://localhost:3000/api/getmold/${moldNo}`)
+                .then(response => response.json())
+                .then(mold => {
+                    // Parse the date field and convert it to 'datetime-local' format
+                    const dateString = mold.date; // Assuming 'date' is the field name
+                    const date = new Date(dateString);
+                    const isoDateTime = date.toISOString().slice(0, 16); // 'datetime-local' format
+
+                    // Set the form fields with the data of the selected mold
+                    document.getElementById('formTitle').innerText = 'Update Mold Details';
+                    document.getElementById('mouldType').value = mold.moldType || '';
+                    document.getElementById('mouldNo').value = mold.moldNo || '';
+                    document.getElementById('date').value = isoDateTime || '';
+                    document.getElementById('lifespan').value = mold.lifespan || '';
+                    document.getElementById('status').value = mold.status || '';
+                    document.getElementById('maintainanceAlert').value = mold.maintainanceAlert || '';
+                    document.getElementById('mouldManufacturerName').value = mold.moldManufacturerName || '';
+                    document.getElementById('manufacturerContact').value = mold.manufacturerContact || '';
+                    document.getElementById('mouldAddedBy').value = mold.moldAddedBy || '';
+                    document.getElementById('remark').value = mold.remark || '';
+
+                    // Change the button text to 'Update'
+                    document.getElementById('submitBtn').innerText = 'Update Mould';
+
+                    // Set the action for form submission to update
+                    document.getElementById('moldForm').onsubmit = function (event) {
+                        event.preventDefault(); // Prevent form submission
+
+                        // Collect form data
+                        const updatedMold = {
+                            moldType: document.getElementById('mouldType').value,
+                            moldNo: document.getElementById('mouldNo').value,
+                            date: document.getElementById('date').value,
+                            lifespan: document.getElementById('lifespan').value,
+                            status: document.getElementById('status').value,
+                            maintainanceAlert: document.getElementById('maintainanceAlert').value,
+                            moldManufacturerName: document.getElementById('mouldManufacturerName').value,
+                            manufacturerContact: document.getElementById('manufacturerContact').value,
+                            moldAddedBy: document.getElementById('mouldAddedBy').value,
+                            remark: document.getElementById('remark').value,
+                        };
+
+                        console.log('Updated Mold Data:', updatedMold);
+
+                        // Send the updated data to the server
+                        fetch(`http://localhost:3000/api/updatemold/${mold.moldNo}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(updatedMold),
+                        })
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('Failed to update mold');
+                                }
+                                return response.json();
+                            })
+                            .then(updatedData => {
+                                showPopup('Mould updated successfully!', 'You may now close this window.','success');
+                                fetchMolds(); // Refresh the table
+                                closeModal(); // Close the modal
+                            })
+                            .catch(error => {
+                                console.error('Error updating mold:', error);
+                                showPopup('Failed to update mould!','Error updating mold. Please try again.','error');
+                            });
+                    };
+
+                    // Open the modal
+                    openModal();
+                })
+                .catch(error => {
+                    console.error('Error fetching mold data:', error);
+                    showPopup('Failed to load!','Error fetching mold data. Please try again.','error');
+                });
+
+
+        }
+
+        function showPopup(title, message, type) {
+            const overlay = document.getElementById('popup-overlay');
+            const popup = document.getElementById('popup');
+            const icon = document.getElementById('popup-icon');
+
+            // Set title and message
+            document.getElementById('popup-title').textContent = title;
+            document.getElementById('popup-message').textContent = message;
+
+            // Adjust icon and styles based on type
+            if (type === 'success') {
+                icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                icon.className = 'text-green-600 text-6xl mb-4 animate-bounce';
+            } else if (type === 'error') {
+                icon.innerHTML = '<i class="fas fa-times-circle"></i>';
+                icon.className = 'text-red-600 text-6xl mb-4 animate-bounce';
+            } else if (type === 'info') {
+                icon.innerHTML = '<i class="fas fa-info-circle"></i>';
+                icon.className = 'text-blue-600 text-6xl mb-4 animate-bounce';
+            }
+
+            // Display the pop-up
+            overlay.classList.remove('hidden');
+            setTimeout(() => {
+                popup.classList.remove('scale-75', 'opacity-0');
+            }, 10);
+        }
+
+        function hidePopup() {
+            const overlay = document.getElementById('popup-overlay');
+            const popup = document.getElementById('popup');
+
+            popup.classList.add('scale-75', 'opacity-0');
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+            }, 300);
+        }
+        // Function to open the modal
+        function openModal() {
+            document.getElementById('addMoldModal').style.display = 'block';
+        }
+
+        // Function to close the modal
+        function closeModal() {
+            document.getElementById('addMoldModal').style.display = 'none';
+        }
+
+    </script>
+
+</body>
+
+</html>

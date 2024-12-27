@@ -1,0 +1,415 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk Data Entry</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Custom styles for the sidebar */
+        #sidebar {
+            width: 70px;
+            background-color: #fcfbfd;
+            color: rgb(74, 72, 72);
+            position: fixed;
+            top: 94px;
+            left: 10px;
+            height: 80%;
+            padding-top: 20px;
+            border-radius: 50%;
+            /* Half-circle shape */
+            transition: width 0.3s, border-radius 0.3s;
+            box-shadow: 5px 5px 20px rgba(0, 247, 255, 0.792);
+            overflow: hidden;
+            z-index: 1000;
+            justify-content: flex-start;
+            box-sizing: border-box;
+        }
+
+        #sidebar.expanded {
+            width: 250px;
+            border-radius: 15px;
+            /* Slightly curved for expansion */
+        }
+
+        #sidebar ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #sidebar ul li {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            text-align: center;
+            transition: background-color 0.3s, color 0.3s;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        #sidebar ul li a {
+            color: rgb(7, 7, 7);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            justify-content: center;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        #sidebar ul li a i {
+            font-size: 30px;
+            margin-left: 10px;
+            /* Increased size for better visibility */
+            margin-right: 10px;
+            /* Add space between icon and text */
+            color: rgb(74, 72, 72);
+        }
+
+        #sidebar.expanded ul li a i {
+            font-size: 32px;
+            /* Larger icon size when sidebar is expanded */
+        }
+
+        #sidebar ul li a span {
+            display: none;
+        }
+
+        #sidebar.expanded ul li a span {
+            display: inline;
+            margin-left: 10px;
+            font-size: 18px;
+            /* Adjust font size for text */
+        }
+
+        #sidebar ul li a:hover {
+            background-color: #a8cbe1;
+            color: rgb(0, 0, 0);
+            border-radius: 10px;
+        }
+
+
+
+        #sidebarToggle {
+            background: none;
+            border: none;
+            color: #00eeff;
+            font-size: 28px;
+            cursor: pointer;
+            position: absolute;
+            top: 100px;
+            left: 21px;
+        }
+
+        main {
+            margin-left: 90px;
+            transition: margin-left 0.6s;
+        }
+
+        #sidebar.expanded+main {
+            margin-left: 270px;
+        }
+
+        @media screen and (max-width: 768px) {
+            #sidebar {
+                width: 60px;
+            }
+
+            #sidebar.expanded {
+                width: 220px;
+            }
+
+            main {
+                margin-left: 60px;
+            }
+
+            #sidebar.expanded+main {
+                margin-left: 200px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            #sidebar {
+                width: 50px;
+            }
+
+            #sidebar.expanded {
+                width: 180px;
+            }
+
+            main {
+                margin-left: 50px;
+            }
+
+            #sidebar.expanded+main {
+                margin-left: 180px;
+            }
+        }
+
+
+        /* Modal styling */
+        .modal {
+            display: none;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex">
+    <div id="backButton" class="fixed top-4 left-4 z-50">
+        <a href="javascript:history.back();" class="flex items-center p-2 rounded-full transition-all duration-300">
+            <img src="https://firebasestorage.googleapis.com/v0/b/tunnel-ac8de.appspot.com/o/icons%2Fundo.png?alt=media&token=64d78468-bdc2-4437-87ca-98b45b6e8e9d"
+                alt="Back Button"
+                class="w-12 h-12 rounded-full transition-all duration-300 hover:border-4 hover:border-black hover:shadow-lg" />
+        </a>
+    </div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar">
+        <button id="sidebarToggle"><i class="fas fa-bars"></i></button>
+        <ul>
+            <li><a href="dashboard.html" class="sidebar-item"><i class="fas fa-tachometer-alt"></i><span>
+                        Dashboard</span></a></li>
+            <li><a href="viewMold.html" class="sidebar-item"><i class="fas fa-cogs"></i><span> Mold
+                        Management</span></a></li>
+            <li><a href="dataEntry.html" class="sidebar-item"><i class="fas fa-database"></i><span> Data
+                        Entry</span></a></li>
+            <li>
+                <a href="bulkDataEntry.html" class="sidebar-item">
+                    <i class="fas fa-upload"></i><span> Bulk Data Entry</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main content -->
+    <div class="flex-1 flex flex-col items-center p-4">
+        <main class="w-full overflow-hidden max-w-[1300px] transition-all duration-300">
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <button id="view-steps-btn"
+                    class="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white px-4 py-2 rounded-lg hover:from-yellow-500 hover:to-yellow-700 flex items-center">
+                    <i class="fas fa-info-circle text-xl"></i>
+                    <span class="ml-2">View Steps</span>
+                </button>
+                <a href="#"
+                    class="bg-gradient-to-r from-green-400 to-green-600 text-white px-4 py-2 rounded-lg hover:from-green-500 hover:to-green-700 flex items-center"
+                    onclick="downloadExcel()">
+                    <i class="fas fa-file-excel text-xl"></i>
+                    <span class="ml-2">Download Excel Format</span>
+                </a>
+            </div>
+
+            <!-- File Upload Section -->
+            <div class="flex justify-center items-center min-h-screen p-4">
+                <!-- File Upload Card -->
+                <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-4xl h-full min-h-[380px] mr-4 flex flex-col">
+                    <div id="file-upload-area"
+                        class="border-2 border-dashed border-gray-300 rounded-lg p-10 text-center flex-grow">
+                        <i class="fas fa-cloud-upload-alt text-5xl text-blue-500 mb-4"></i>
+                        <p class="text-gray-600 font-bold text-2xl mb-4">Drag and drop files here</p>
+                        <p class="text-gray-400 text-xl mb-4">or</p>
+                        <button id="browse-button"
+                            class="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-2 rounded-lg hover:from-blue-600 hover:to-purple-600 font-bold text-2xl">Browse
+                            files</button>
+                    </div>
+                    <!-- Submit button -->
+                    <button style="display: none;" id="submit-button"
+                        class="bg-gradient-to-r from-green-400 to-green-600 text-white px-4 py-2 rounded-lg hover:from-green-500 hover:to-green-700 items-center mt-6">
+                        <i class="fas fa-check-circle text-xl"></i>
+                        <span class="ml-2">Submit Data</span>
+                    </button>
+                </div>
+
+                <!-- Log Data Card -->
+                <div
+                    class="bg-white p-4 rounded-lg shadow-md w-full max-w-md h-full min-h-[380px] overflow-hidden flex flex-col">
+                    <h3 class="text-xl font-bold mb-4">Operation Logs:</h3>
+                    <div id="logs" class="mt-4 space-y-4 flex-grow overflow-y-auto max-h-[250px]">
+
+                        <!-- More logs will be appended here -->
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+            <!-- Modal for steps -->
+            <div id="steps-modal" class="modal fixed inset-0 bg-gray-800 bg-opacity-50 items-center justify-center">
+                <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-lg relative">
+                    <button id="close-modal-btn" class="absolute top-2 right-3 text-gray-500 hover:text-red-700">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+                    <h2 class="text-2xl font-bold mb-4">Steps to Upload Data in Bulk</h2>
+                    <ol class="list-decimal list-inside space-y-2">
+                        <li>Download the Excel format by clicking the "Download Excel Format" button.</li>
+                        <li>Open the downloaded Excel file.</li>
+                        <li>Fill in the required data in the respective columns.</li>
+                        <li>Analyze the two entries of possibility and ensure your data aligns with those entries.</li>
+                        <li>Before adding your data, remove the demo data provided in the Excel file.</li>
+                        <li>Save the Excel file after entering all the data.</li>
+                        <li>Return to this page and drag and drop the filled Excel file into the upload area.</li>
+                        <li>Click the "Browse files" button if you prefer to select the file manually.</li>
+                        <li>Wait for the upload to complete and verify the data.</li>
+                    </ol>
+                    <p class="text-red-500 font-bold">Note: Please don't change the names of the column headers.</p>
+
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        const submitButton = document.getElementById('submit-button');
+        const logArea = document.getElementById('logs');
+        let excelData = [];
+
+        // Handle file input
+        document.getElementById('browse-button').addEventListener('click', () => {
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = '.xlsx';
+            fileInput.click();
+
+            fileInput.addEventListener('change', function (event) {
+                const file = event.target.files[0];
+                if (file) {
+                    readExcel(file);
+                }
+            });
+        });
+
+        // Read the Excel file and convert it to JSON
+        function readExcel(file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const data = e.target.result;
+                const workbook = XLSX.read(data, { type: 'binary' });
+                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                excelData = XLSX.utils.sheet_to_json(sheet);
+                submitButton.style.display = 'block'; // Show the submit button
+                log(`File loaded successfully with ${excelData.length} records.`);
+            };
+            reader.readAsBinaryString(file);
+        }
+
+        // Submit the data
+        submitButton.addEventListener('click', async () => {
+            for (const record of excelData) {
+                try {
+                    const response = await fetch('http://localhost:3000/api/submit-data', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(record),
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                        log(`Success: Data for mold ${record.moldNumber} submitted.`);
+                    } else {
+                        log(`Failed: Error for mold ${record.moldNumber}: ${result.message}`);
+                    }
+                } catch (error) {
+                    log(`Error: Failed to submit data for mold ${record.moldNumber}.`);
+                }
+            }
+        });
+
+        // Append log messages
+        function log(message) {
+            const logEntry = document.createElement('div');
+            logEntry.className = 'bg-gray-100 p-2 rounded-lg shadow-sm mb-2'; // Add styling for the log entry
+
+            const logMessage = document.createElement('p');
+            logMessage.className = 'text-gray-700'; // Add text color for better readability
+            logMessage.textContent = message;
+
+            logEntry.appendChild(logMessage);
+            document.getElementById('logs').appendChild(logEntry); // Append the styled log entry to the log area
+        }
+
+
+
+        // Show modal when "View Steps" button is clicked
+        document.getElementById('view-steps-btn').addEventListener('click', function () {
+            document.getElementById('steps-modal').classList.add('active');
+        });
+
+        // Close modal when the close button is clicked
+        document.getElementById('close-modal-btn').addEventListener('click', function () {
+            document.getElementById('steps-modal').classList.remove('active');
+        });
+
+
+
+        function downloadExcel() {
+            // Create a new Date object for the current date and time
+            const currentDate = new Date();
+
+            // Create a DateTimeFormat object for IST
+            const formatter = new Intl.DateTimeFormat('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+            });
+
+            // Format the current date and time
+            const indianTime = formatter.format(currentDate);
+
+            // Split the formatted date and time into separate parts
+            const [day, month, year, hour, minute, second] = indianTime.split(/[^0-9]/).filter(Boolean);
+
+            // Construct the desired format
+            const formattedTime = `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+
+            console.log(formattedTime);
+
+
+            // Sample data to be included in the Excel file
+            const data = [
+                ["moldType", "moldNumber", "dateTime", "breakdownOccur", "beforeBreakdownProduction", "problemResolved", "costNeeded", "cost", "afterBreakdownProduction", "remark", "operatorName", "operatorId", "productionCnt", "remarkNoBreakdown", "operatorNameNoBreakdown", "operatorIdNoBreakdown"],
+                ["Transfer Moulding", "6009", formattedTime, "no", "0", "", "", "0", "0", "", "", "", "478", "NA", "Mohan", "1196"],
+                ["Injection Moulding", "9279", formattedTime, "yes", "577", "yes", "yes", "4429", "86", "NA", "Mohan", "1196", "0", "", "", ""]
+            ];
+
+            // Create a new workbook and a new worksheet
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(data);
+
+            // Append the worksheet to the workbook
+            XLSX.utils.book_append_sheet(wb, ws, "Mould Data");
+
+            // Generate a file name
+            const fileName = "mould_data_entry_format.xlsx";
+
+            // Save the workbook
+            XLSX.writeFile(wb, fileName);
+        }
+
+
+        // Sidebar toggle
+        document.getElementById('sidebarToggle').addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('expanded');
+        });
+    </script>
+</body>
+
+</html>
