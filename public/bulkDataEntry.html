@@ -310,7 +310,7 @@
         submitButton.addEventListener('click', async () => {
             for (const record of excelData) {
                 try {
-                    const response = await fetch('http://localhost:3000/api/submit-data', {
+                    const response = await fetch('/api/submit-data', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
