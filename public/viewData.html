@@ -291,7 +291,7 @@
         // Function to fetch data and populate the table
         async function fetchAndPopulateMoldData(moldNo) {
             try {
-                const response = await fetch(`http://localhost:3000/api/getDateEntry/${moldNo}`); // Fetch data from the API
+                const response = await fetch(`/api/getDateEntry/${moldNo}`); // Fetch data from the API
                 if (response.ok) {
                     const data = await response.json(); // Parse the JSON response
                     const tbody = document.getElementById('moldDataBody');
