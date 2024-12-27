@@ -637,7 +637,7 @@
 
         // Function to fetch dynamic data based on the view
         async function fetchData(view) {
-            const response = await fetch(`http://localhost:3000/api/production-data?view=${view}&mouldNo=${getQueryParam('mouldNo')}`);
+            const response = await fetch(`/api/production-data?view=${view}&mouldNo=${getQueryParam('mouldNo')}`);
             const data = await response.json();
             productionData = data.productionData;
             breakdownData = data.breakdownData;
@@ -778,7 +778,7 @@
         async function loadPie() {
             try {
                 // Fetch data from the API endpoint
-                const response = await fetch(`http://localhost:3000/api/fetch-pie/${moldNo}`);
+                const response = await fetch(`/api/fetch-pie/${moldNo}`);
 
                 // Check if the response is successful
                 if (!response.ok) {
@@ -940,7 +940,7 @@
 
             if (moldNo) {
                 // Fetch data from the backend using moldNo
-                fetch(`http://localhost:3000/api/getmold/${moldNo}`)
+                fetch(`/api/getmold/${moldNo}`)
                     .then(response => {
                         if (!response.ok) {
                             throw new Error('Mould data not found');
@@ -1029,7 +1029,7 @@
 
         async function load_week_data() {
             // Ensure that the moldNumber is properly passed into the URL
-            fetch(`http://localhost:3000/api/get-weekly-data/${moldNo}`)
+            fetch(`/api/get-weekly-data/${moldNo}`)
                 .then(response => response.json())
                 .then(data => {
                     production_cnt = Number(data.productionCount);
