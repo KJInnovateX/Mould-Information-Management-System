@@ -582,7 +582,7 @@
             }
 
             // Fetch user details from the server
-            const response = await fetch(`http://localhost:3000/user/${companyId}`, { method: 'GET' });
+            const response = await fetch(`/user/${companyId}`, { method: 'GET' });
             const result = await response.json();
 
             if (response.ok) {
@@ -614,7 +614,7 @@
         }
 
         function load_data() {
-            fetch('http://localhost:3000/api/dashboard-data')
+            fetch('/api/dashboard-data')
                 .then(response => response.json())
                 .then(data => {
                     const dailyProduction = data.dailyProduction;
@@ -683,7 +683,7 @@
         // Fetch data from the backend API
         function load_weekly_data() {
             // Fetch data from the backend API
-            fetch('http://localhost:3000/api/weekly-production')
+            fetch('/api/weekly-production')
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok ' + response.statusText);
@@ -824,7 +824,7 @@
                 const mobile = document.getElementById('mobileNo').value;
 
                 try {
-                    const response = await fetch('http://localhost:3000/api/set-alert', {
+                    const response = await fetch('/api/set-alert', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -892,7 +892,7 @@
         });
 
         function fetchNotifications() {
-            fetch('http://localhost:3000/api/notifications')
+            fetch('/api/notifications')
                 .then(response => response.json())
                 .then(notifications => {
                     const notificationsContainer = document.getElementById('notifications');
@@ -984,7 +984,7 @@
     minutes = minutes < 10 ? '0' + minutes : minutes;
 
     const time = `${hours}:${minutes} ${ampm}`;
-    return `${dayOfWeek}, ${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
+    return `${dayOfWeek}, ${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}, ${time}`;
 }
 
 
