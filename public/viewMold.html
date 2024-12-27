@@ -418,7 +418,7 @@
         async function fetchMolds() {
             try {
                 const selectedStatus = document.getElementById('statusFilter').value;
-                const response = await fetch(`http://localhost:3000/api/getmolds?status=${selectedStatus}`);
+                const response = await fetch(`/api/getmolds?status=${selectedStatus}`);
                 const data = await response.json();
 
                 const tableBody = document.getElementById('moldDataBody');
@@ -503,7 +503,7 @@
         // Function to open the modal with the data of the selected mold
         function openUpdateForm(moldNo) {
             // Fetch mold data by moldNo (Assuming the moldNo is unique)
-            fetch(`http://localhost:3000/api/getmold/${moldNo}`)
+            fetch(`/api/getmold/${moldNo}`)
                 .then(response => response.json())
                 .then(mold => {
                     // Parse the date field and convert it to 'datetime-local' format
@@ -548,7 +548,7 @@
                         console.log('Updated Mold Data:', updatedMold);
 
                         // Send the updated data to the server
-                        fetch(`http://localhost:3000/api/updatemold/${mold.moldNo}`, {
+                        fetch(`/api/updatemold/${mold.moldNo}`, {
                             method: 'PUT',
                             headers: {
                                 'Content-Type': 'application/json',
