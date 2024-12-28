@@ -418,7 +418,7 @@ setInterval(() => {
       const { mold_id, moldNo, lifespan, maintainanceAlert, production_cnt } = mold;
 
       const mobileNo=['+919579029553','+919307595421'];
-      const emailId=['karanjadhav3526@gmail.com','nikpranav1983@gmail.com'];
+      const emailId=['karanjadhav3526@gmail.com','nikpranav2983@gmail.com'];
       // Check if mold is expired
 
 
