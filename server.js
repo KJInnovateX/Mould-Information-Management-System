@@ -636,7 +636,7 @@ app.get('/api/getmolds', (req, res) => {
     query += ` WHERE status = ?`;  // Use parameterized query for safety
   }
 
-
+query += ' ORDER BY date DESC';
   db.query(query, [statusFilter], (err, results) => {
     if (err) {
       res.status(500).send('Error fetching moulds data');
