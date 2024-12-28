@@ -303,8 +303,6 @@ setInterval(() => {
                 VALUES (?,"limitAlert", ?, CONVERT_TZ(NOW(), '+00:00', '+05:30'))
             `;
       const message = `
-    Subject: Alert: Mould No. ${mouldNo} Production Limit Reached
-
     Dear User,
 
     This is to notify you that the production limit set for Mould No. ${moldNumber} has been reached.
