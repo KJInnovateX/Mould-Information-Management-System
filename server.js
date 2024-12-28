@@ -4,10 +4,10 @@ const bodyParser = require('body-parser');
 const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
-const path = require('path');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 const twilio = require('twilio');
+const { setDefaultHighWaterMark } = require('nodemailer/lib/xoauth2');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -56,13 +56,6 @@ db.query("SET time_zone = '+05:30'", (err) => {
   else {
     console.log("Time zone set +05:30");
   }
-});
-
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Default route to serve the index.html
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 //login and register 
@@ -180,7 +173,6 @@ app.get('/user/:companyId', (req, res) => {
     });
   });
 });
-
 
 
 // dashboard cards
@@ -302,7 +294,20 @@ setInterval(() => {
                 INSERT INTO notifications (moldNumber, notification_type, message, date_time)
                 VALUES (?,"limitAlert", ?, CONVERT_TZ(NOW(), '+00:00', '+05:30'))
             `;
-      const message = `Production limit exceeded for Mould No.: ${moldNumber}. Limit set: ${productionLimit}`;
+      const message = `
+    Subject: Alert: Mould No. ${mouldNo} Production Limit Reached
+
+    Dear User,
+
+    This is to notify you that the production limit set for Mould No. ${moldNumber} has been reached.
+
+    Limit Set: ${productionLimit} Units.
+
+    This is an automated alert for your awareness.
+
+    Thank you,
+    Mould Information Management System
+  `;
 
       db.query(notificationQuery, [moldNumber, message], (err) => {
         if (err) {
@@ -314,29 +319,7 @@ setInterval(() => {
         console.log('Notification added for Mold:', moldNumber);
 
         // Send Email with the same timestamp message
-        const transporter = nodemailer.createTransport({
-          service: 'gmail',
-          auth: {
-            user: 'stunnel909@gmail.com',
-            pass: 'bwfa ghcs hvaf vusi'
-          }
-        });
-
-        const mailOptions = {
-          from: 'stunnel909@gmail.com',
-          to: email,
-          subject: 'Production Alert',
-          text: message
-        };
-
-        transporter.sendMail(mailOptions, (err) => {
-          if (err) {
-            console.error('Error sending email:', err);
-            isProcessing = false;
-            return;
-          }
-
-          console.log('Email sent to:', email);
+          sendEmail(email, message);
           sendSMS(mobileNo, message);
 
           // Delete Alert after sending the email
@@ -348,13 +331,40 @@ setInterval(() => {
               console.log('Alert deleted for Mold:', moldNumber);
             }
           });
-        });
+        
       });
     });
 
     isProcessing = false;  // Reset the flag after processing is done
   });
 }, 60000); // Check every 30 seconds
+
+function sendEmail(email,message)
+{
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'stunnel909@gmail.com',
+      pass: 'bwfa ghcs hvaf vusi'
+    }
+  });
+
+  const mailOptions = {
+    from: 'stunnel909@gmail.com',
+    to: email,
+    subject:'Notification from Mould Information Management System',
+    text: message
+  };
+
+  transporter.sendMail(mailOptions, (err, info) => {
+    if (err) {
+      console.error('Error sending email:', err);
+    } else {
+      console.log(`Email sent successfully to: ${email}`);
+      console.log('Message ID:', info.messageId);
+    }
+  });
+}
 
 function sendSMS(to, message) {
   const from = '+18144262249'; // Replace with your Twilio phone number
@@ -401,8 +411,8 @@ setInterval(() => {
     molds.forEach((mold) => {
       const { mold_id, moldNo, lifespan, maintainanceAlert, production_cnt } = mold;
 
-      const mobileNo=['+919579029553'];
-
+      const mobileNo=['+919579029553','+919307595421'];
+      const emailId=['karanjadhav3526@gmail.com','nikpranav1983@gmail.com'];
       // Check if mold is expired
 
 
@@ -413,6 +423,11 @@ setInterval(() => {
         updateMoldStatus(mold_id, newStatus, () => {
           addNotification(moldNo, "expiration", message);
           console.log('SMS send on', mobileNo);
+          
+          emailId.forEach((email)=>{
+            sendEmail(email,message);
+          });
+
           mobileNo.forEach((no)=>{
           sendSMS(no, message)});
         });
@@ -424,6 +439,9 @@ setInterval(() => {
         updateMoldNotification(mold_id, newStatus, () => {
           addNotification(moldNo, "expiration_soon", message);
           console.log('SMS send on', mobileNo);
+          emailId.forEach((email)=>{
+            sendEmail(email,message);
+          });
           mobileNo.forEach((no)=>{
             sendSMS(no, message)});
         });
@@ -436,6 +454,9 @@ setInterval(() => {
         updateMoldStatusAndcnt(mold_id, newMaintainanceCnt, newStatus, () => {
           addNotification(moldNo, "maintenance", message);
           console.log('SMS send on', mobileNo);
+          emailId.forEach((email)=>{
+            sendEmail(email,message);
+          });
           mobileNo.forEach((no)=>{
             sendSMS(no, message)});
         });
@@ -448,6 +469,9 @@ setInterval(() => {
         updateMoldStatusAndcnt(mold_id, newMaintainanceCnt, newStatus, () => {
           addNotification(moldNo, "near_maintenance", message);
           console.log('SMS send on', mobileNo);
+          emailId.forEach((email)=>{
+            sendEmail(email,message);
+          });
           mobileNo.forEach((no)=>{
             sendSMS(no, message)});
         });
@@ -923,7 +947,6 @@ app.post('/api/submit-data', (req, res) => {
 
 
 // Start the Server
-
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT} `);
 });
