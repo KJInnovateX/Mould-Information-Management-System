@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
+const path = require('path');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 const twilio = require('twilio');
@@ -56,6 +57,13 @@ db.query("SET time_zone = '+05:30'", (err) => {
   else {
     console.log("Time zone set +05:30");
   }
+});
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Default route to serve the index.html
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 //login and register 
