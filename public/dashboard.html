@@ -618,7 +618,7 @@ main {
             fetch('/api/dashboard-data')
                 .then(response => response.json())
                 .then(data => {
-                    const dailyProduction = data.dailyProduction;
+                    let dailyProduction = data.dailyProduction;
                     if (dailyProduction == null) {
                         dailyProduction = 0;
                     }
