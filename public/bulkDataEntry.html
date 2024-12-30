@@ -348,12 +348,12 @@ main {
                     });
                     const result = await response.json();
                     if (response.ok) {
-                        log(`Success: Data for mold ${record.moldNumber} submitted.`);
+                        log(`Success: Data for mould number ${record.moldNumber} submitted.`);
                     } else {
-                        log(`Failed: Error for mold ${record.moldNumber}: ${result.message}`);
+                        log(`Failed: Error for mould number ${record.moldNumber}: ${result.message}`);
                     }
                 } catch (error) {
-                    log(`Error: Failed to submit data for mold ${record.moldNumber}.`);
+                    log(`Error: Failed to submit data for mould number ${record.moldNumber}.`);
                 }
             }
         });
