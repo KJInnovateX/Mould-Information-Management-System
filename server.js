@@ -294,7 +294,7 @@ setInterval(() => {
     }
 
     results.forEach(alert => {
-      const { id, moldNumber, email, productionLimit, mobileNo } = alert;
+      const { id, moldNumber, email, productionLimit, mobileNo , totalProduction} = alert;
 
 
       // Add Notification with the fixed timestamp
@@ -303,16 +303,17 @@ setInterval(() => {
                 VALUES (?,"limitAlert", ?, CONVERT_TZ(NOW(), '+00:00', '+05:30'))
             `;
       const message = `
-    Dear User,
+Dear User,
 
-    This is to notify you that the production limit set for Mould No. ${moldNumber} has been reached.
+This is to notify you that the production limit for Mould No. ${moldNumber} has been reached.
 
-    Limit Set: ${productionLimit} Units.
+Limit Set: ${productionLimit.toLocaleString()} Units ,
+Current Production: ${totalProduction.toLocaleString()} Units
 
-    This is an automated alert for your awareness.
+This is an automated alert for your awareness.
 
-    Thank you,
-    Mould Information Management System
+Thank you,  
+Mould Information Management System
   `;
 
       db.query(notificationQuery, [moldNumber, message], (err) => {
@@ -417,69 +418,89 @@ setInterval(() => {
     molds.forEach((mold) => {
       const { mold_id, moldNo, lifespan, maintainanceAlert, production_cnt } = mold;
 
-      const mobileNo=['+919579029553','+919307595421'];
-      const emailId=['karanjadhav3526@gmail.com','nikpranav2983@gmail.com'];
+      const mobileNo = ['+919579029553', '+919307595421'];
+      const emailId = ['karanjadhav3526@gmail.com', 'nikpranav2983@gmail.com'];
+      const maintenanceNumber = Math.round(production_cnt / maintainanceAlert);
+      const getOrdinalSuffix = (num) => {
+        const lastDigit = num % 10;
+        const lastTwoDigits = num % 100;
+        if (lastTwoDigits >= 11 && lastTwoDigits <= 13) return "th";
+        if (lastDigit === 1) return "st";
+        if (lastDigit === 2) return "nd";
+        if (lastDigit === 3) return "rd";
+        return "th";
+      };
       // Check if mold is expired
 
 
 
       if (production_cnt >= lifespan) {
         const newStatus = "Inactive";
-        const message = `Mould No. ${moldNo} has expired. Production count (${production_cnt} Units) has exceeded its lifespan (${lifespan} Units). Status has been changed to '${newStatus}'.`;
+        const message = `Mould No. ${moldNo} has expired. Production count ${production_cnt.toLocaleString()} Units has exceeded its lifespan ${lifespan.toLocaleString()} Units. Status has been changed to '${newStatus}'.`;
         updateMoldStatus(mold_id, newStatus, () => {
           addNotification(moldNo, "expiration", message);
           console.log('SMS send on', mobileNo);
-          
-          emailId.forEach((email)=>{
-            sendEmail(email,message);
+
+          emailId.forEach((email) => {
+            sendEmail(email, message);
           });
 
-          mobileNo.forEach((no)=>{
-          sendSMS(no, message)});
+          mobileNo.forEach((no) => {
+            sendSMS(no, message)
+          });
         });
       }
 
       else if (production_cnt >= lifespan - (lifespan * 0.3) && mold.notificationStatus === "NA") {
         const newStatus = "Send";
-        const message = `Mould No. ${moldNo} is nearing expiration. Its production count (${production_cnt} units) has surpassed its lifespan limit of ${lifespan} units.`;
+        const message = `Mould No. ${moldNo} is nearing expiration. Its production count ${production_cnt.toLocaleString()} units has surpassed its lifespan limit of ${lifespan.toLocaleString()} units.`;
         updateMoldNotification(mold_id, newStatus, () => {
           addNotification(moldNo, "expiration_soon", message);
           console.log('SMS send on', mobileNo);
-          emailId.forEach((email)=>{
-            sendEmail(email,message);
+          emailId.forEach((email) => {
+            sendEmail(email, message);
           });
-          mobileNo.forEach((no)=>{
-            sendSMS(no, message)});
+          mobileNo.forEach((no) => {
+            sendSMS(no, message)
+          });
         });
       }
       // Check if maintenance is required
       else if (production_cnt >= mold.maintainanceAlertCurrentStatus) {
         const newStatus = "Under Maintenance";
         const newMaintainanceCnt = mold.maintainanceAlertCurrentStatus + maintainanceAlert
-        const message = `Mould No. ${moldNo} requires maintenance. Production count (${production_cnt} Units) has exceeded the maintenance alert (${maintainanceAlert} Units). Status has been changed to '${newStatus}'. Next maintenance is after ${mold.maintainanceAlertCurrentStatus + maintainanceAlert} Production Units`;
+        const ordinalSuffix = getOrdinalSuffix(maintenanceNumber);
+
+        const message = `${maintenanceNumber}${ordinalSuffix} maintenance is needed for Mould No. ${moldNo}. Current production count: ${production_cnt.toLocaleString()} units, exceeding the threshold of ${mold.maintainanceAlertCurrentStatus.toLocaleString()} units. Status has been changed to '${newStatus}'. Next maintenance is after ${(mold.maintainanceAlertCurrentStatus + maintainanceAlert).toLocaleString()} Production Units`;
+
         updateMoldStatusAndcnt(mold_id, newMaintainanceCnt, newStatus, () => {
           addNotification(moldNo, "maintenance", message);
           console.log('SMS send on', mobileNo);
-          emailId.forEach((email)=>{
-            sendEmail(email,message);
+          emailId.forEach((email) => {
+            sendEmail(email, message);
           });
-          mobileNo.forEach((no)=>{
-            sendSMS(no, message)});
+          mobileNo.forEach((no) => {
+            sendSMS(no, message)
+          });
         });
       }
 
       else if (production_cnt >= mold.maintainanceAlertCurrentStatus - (mold.maintainanceAlertCurrentStatus * 0.1) && mold.perMaintenanceAlert === "NA") {
         const newStatus = "Near Maintenance";
         const newMaintainanceCnt = 0;
-        const message = `Mould No. ${moldNo} is nearing maintenance. Production count (${production_cnt} Units) is approaching the maintenance alert threshold (${maintainanceAlert} Units).`;
+        const ordinalSuffix = getOrdinalSuffix(maintenanceNumber);
+        const message = `Mould No. ${moldNo} will need its ${maintenanceNumber}${ordinalSuffix} maintenance soon. Current production count: ${production_cnt.toLocaleString()} units and Threshold: ${mold.maintainanceAlertCurrentStatus.toLocaleString()} units.`;
+
+        
         updateMoldStatusAndcnt(mold_id, newMaintainanceCnt, newStatus, () => {
           addNotification(moldNo, "near_maintenance", message);
           console.log('SMS send on', mobileNo);
-          emailId.forEach((email)=>{
-            sendEmail(email,message);
+          emailId.forEach((email) => {
+            sendEmail(email, message);
           });
-          mobileNo.forEach((no)=>{
-            sendSMS(no, message)});
+          mobileNo.forEach((no) => {
+            sendSMS(no, message)
+          });
         });
       }
     });
@@ -725,9 +746,9 @@ app.get('/api/get-weekly-data/:moldNo', (req, res) => {
   `;
 
   const queryMaintenance = `
-    SELECT COUNT(*) AS maintenance_count 
-    FROM mold_data_entry 
-    WHERE mold_number = ? AND problem_resolved = 'Yes' ;
+    SELECT maintainanceAlert AS maintenance_count 
+    FROM mold
+    WHERE moldNo = ?;
   `;
 
   const queryCost = `
@@ -756,10 +777,16 @@ app.get('/api/get-weekly-data/:moldNo', (req, res) => {
     executeQuery(queryCost, [moldNo])
   ])
     .then(([productionResult, maintenanceResult, costResult]) => {
+      const productionCount = productionResult[0]?.production_cnt || 0;
+      const maintenanceCount = productionCount === 0
+        ? 0
+        : Math.floor(productionCount / (maintenanceResult[0]?.maintenance_count || 1)); // Avoid division by zero
+      const totalCost = costResult[0]?.total_cost || 0;
+
       const dashboardData = {
-        productionCount: productionResult[0]?.production_cnt || 0,
-        maintenanceCount: maintenanceResult[0]?.maintenance_count || 0,
-        totalCost: costResult[0]?.total_cost || 0
+        productionCount,
+        maintenanceCount,
+        totalCost,
       };
 
       res.json(dashboardData);  // Send the data back as JSON
