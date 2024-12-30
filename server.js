@@ -904,11 +904,11 @@ app.post('/api/submit-data', (req, res) => {
   db.query(checkMoldQuery, [data.moldNumber], (checkErr, checkResults) => {
     if (checkErr) {
       console.error('Error checking mold_number:', checkErr);
-      return res.status(500).send('Failed to validate mold number');
+      return res.status(500).send('Failed to validate mould number');
     }
 
     if (checkResults.length === 0) {
-      return res.status(400).send('Mold not found. Please add the mold first.');
+      return res.status(400).send('Mould not found. Please add the mould first.');
     }
 
     const insertQuery = `
@@ -945,7 +945,7 @@ app.post('/api/submit-data', (req, res) => {
         return res.status(500).send('Failed to store data');
       }
       res.status(200).send({ status: 'success', message: 'Data stored successfully' });
-      console.log(`Data Added Successfully. Mold No.: ${data.moldNumber}`);
+      console.log(`Data Added Successfully. Mould No.: ${data.moldNumber}`);
     });
   });
 });
