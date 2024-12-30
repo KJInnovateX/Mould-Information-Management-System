@@ -1037,7 +1037,7 @@ main {
                     // Populate the dashboard with dynamic data
                     document.getElementById('moldProduction').innerText = data.productionCount.toLocaleString() + " Units";
                     document.getElementById('moldMaintenance').innerText = data.maintenanceCount;
-                    document.getElementById('costUsed').innerText = `₹ ${data.totalCost.toLocaleString().toFixed(2)}`;
+                    document.getElementById('costUsed').innerText = `₹ ${data.totalCost.toFixed(2).toLocaleString()}`;
                     console.log(data);
                 })
                 .catch(error => {
