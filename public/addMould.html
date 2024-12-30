@@ -335,7 +335,6 @@ main {
                 console.log('Form Data:', formData);
                 if (response.ok) {
                     showPopup('Mould Data added successfully!', 'You can now close this window.', 'success');
-                    document.getElementById("form").reset();
                 } else {
                     const error = await response.json();
                     showPopup('Error!', `Please recheck all field's once. ${error.error} `, 'info');
