@@ -293,7 +293,26 @@ main {
             });
         });
 
-        // Read the Excel file and convert it to JSON
+       // Function to convert Excel date serial number to JavaScript Date
+        function excelDateToJSDate(serial) {
+            const excelEpoch = new Date(1899, 11, 30); // Excel's epoch starts at December 30, 1899
+            const millisPerDay = 24 * 60 * 60 * 1000; // Milliseconds in a day
+            const date = new Date(excelEpoch.getTime() + serial * millisPerDay);
+            return date;
+        }
+
+        // Format the date to MySQL-compatible format
+        function formatDateToMySQL(date) {
+            const yyyy = date.getFullYear();
+            const mm = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+            const dd = String(date.getDate()).padStart(2, '0');
+            const hh = String(date.getHours()).padStart(2, '0');
+            const mi = String(date.getMinutes()).padStart(2, '0');
+            const ss = String(date.getSeconds()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss}`;
+        }
+
+        // Modify the readExcel function to process the date
         function readExcel(file) {
             const reader = new FileReader();
             reader.onload = function (e) {
@@ -301,6 +320,15 @@ main {
                 const workbook = XLSX.read(data, { type: 'binary' });
                 const sheet = workbook.Sheets[workbook.SheetNames[0]];
                 excelData = XLSX.utils.sheet_to_json(sheet);
+
+                // Convert the date for all records
+                excelData.forEach(record => {
+                    if (record.dateTime) {
+                        const jsDate = excelDateToJSDate(record.dateTime);
+                        record.dateTime = formatDateToMySQL(jsDate); // Replace with MySQL-compatible format
+                    }
+                });
+
                 submitButton.style.display = 'block'; // Show the submit button
                 log(`File loaded successfully with ${excelData.length} records.`);
             };
