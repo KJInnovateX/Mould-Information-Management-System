@@ -434,9 +434,9 @@ setInterval(() => {
 
 
 
-      if (production_cnt >= lifespan) {
+     if (production_cnt >= lifespan) {
         const newStatus = "Inactive";
-        const message = `Mould No. ${moldNo} has expired. Production count ${production_cnt.toLocaleString()} Units has exceeded its lifespan ${lifespan.toLocaleString()} Units. Status has been changed to '${newStatus}'.`;
+        const message = `Mould No. ${moldNo} has expired, It time to change mould. Production count ${production_cnt.toLocaleString()} Units has exceeded its lifespan ${lifespan.toLocaleString()} Units. Status has been changed to '${newStatus}'.`;
         updateMoldStatus(mold_id, newStatus, () => {
           addNotification(moldNo, "expiration", message);
           console.log('SMS send on', mobileNo);
@@ -453,7 +453,7 @@ setInterval(() => {
 
       else if (production_cnt >= lifespan - (lifespan * 0.3) && mold.notificationStatus === "NA") {
         const newStatus = "Send";
-        const message = `Mould No. ${moldNo} is nearing expiration. Its production count ${production_cnt.toLocaleString()} units has surpassed its lifespan limit of ${lifespan.toLocaleString()} units.`;
+        const message = `Mould No. ${moldNo} has expired. It is time to change the mould. The production count of ${production_cnt.toLocaleString()} units has exceeded its lifespan of ${lifespan.toLocaleString()} units. The status has been updated to '${newStatus}'.`;
         updateMoldNotification(mold_id, newStatus, () => {
           addNotification(moldNo, "expiration_soon", message);
           console.log('SMS send on', mobileNo);
